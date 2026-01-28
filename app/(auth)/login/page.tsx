@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 
 export default function Page() {
@@ -10,8 +11,8 @@ export default function Page() {
       </div>
 
       <div className="space-y-6">
-        <button
-          type="button"
+        <Link
+          href={'/'}
           className="cursor-pointer group relative w-full flex items-center justify-center gap-4 bg-[#002B5C] hover:bg-[#001f42] text-white py-4.5 px-6 rounded-2xl transition-all duration-300 shadow-xl shadow-[#002B5C]/10 hover:shadow-[#002B5C]/20 active:scale-[0.98]"
         >
           <div className="bg-white p-1 rounded-md">
@@ -25,7 +26,7 @@ export default function Page() {
           <span className="text-sm font-bold tracking-wide">
             Sign in with Microsoft
           </span>
-        </button>
+        </Link>
       </div>
     </div>
   );
