@@ -7,6 +7,7 @@ import {
   Plus,
   ChevronDown,
 } from "lucide-react";
+import Link from "next/link";
 
 function NavBar() {
   return (
@@ -67,10 +68,10 @@ function NavBar() {
           </button>
 
           {/* Primary Action: New Case */}
-          <button className="flex items-center gap-2 px-5 py-2.5 bg-[#002B5C] text-white rounded-xl text-sm font-bold shadow-lg shadow-blue-900/20 hover:bg-[#001d3d] transition-all active:scale-95 group">
+          <Link href={'/cases/create-new'} className="flex items-center gap-2 px-5 py-2.5 bg-[#002B5C] text-white rounded-xl text-sm font-bold shadow-lg shadow-blue-900/20 hover:bg-[#001d3d] transition-all active:scale-95 group">
             <Plus className="w-4 h-4 stroke-[3px] group-hover:rotate-90 transition-transform duration-300" />
             <span>New Case</span>
-          </button>
+          </Link>
         </div>
       </div>
     </div>
