@@ -14,10 +14,9 @@ interface StatCardProps {
 
 function StatCard({ stat }: StatCardProps) {
     return (
-        <div className={` relative overflow-hidden ${stat.bgColor} ${stat.borderColor} border p-6 rounded-2xl shadow-xl transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 group cursor-default min-h-35 flex flex-col justify-center`}>
+        <div className={` relative overflow-hidden ${stat.bgColor} ${stat.borderColor} border p-6 rounded-xl shadow-xl transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 group cursor-default min-h-35 flex flex-col justify-center`}>
             
-            {/* Background Decorative Icon - Reduced opacity to keep text readable */}
-            <stat.icon className="absolute -right-4 -bottom-4 w-32 h-32 text-white/5 -rotate-12 group-hover:rotate-0 transition-transform duration-700" />
+          
 
             <div className="relative z-10 flex items-center justify-between gap-4">
                 
@@ -31,7 +30,7 @@ function StatCard({ stat }: StatCardProps) {
                             {stat.label}
                         </h2>
                     </div>
-                    <p className="text-white/40 text-[11px] font-medium italic tracking-wide pl-11">
+                    <p className="text-white/40 text-[11px] font-medium tracking-wide pl-11">
                         {stat.description}
                     </p>
                 </div>
@@ -41,7 +40,7 @@ function StatCard({ stat }: StatCardProps) {
                     <h3 className="text-3xl font-black text-white tracking-tighter">
                         {stat.value}
                     </h3>
-                    <div className={`h-2 w-2 rounded-full ${stat.accentColor} animate-pulse shadow-[0_0_12px_rgba(255,255,255,0.4)]`} />
+                   
                 </div>
             </div>
 
