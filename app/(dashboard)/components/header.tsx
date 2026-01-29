@@ -9,8 +9,8 @@ function Header() {
           <div>
             
             
-            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-              Good Morning, <span className="text-[#002B5C]">Brandon</span>
+            <h1 className="font-bold text-xl text-slate-900 -tracking-normal">
+              Welcome back, <span className="text-[#002B5C] ">Brandon</span>
             </h1>
             
           </div>
