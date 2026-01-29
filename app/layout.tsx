@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Legal Case Management System | SINPF",
+  title: "LIMS",
   description: "Legal Case Management Portal",
 };
 
