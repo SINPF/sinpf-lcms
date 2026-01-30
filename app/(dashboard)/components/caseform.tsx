@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { X } from "lucide-react";
 import General from "./caseform-tabs/general";
 import CaseInformation from "./caseform-tabs/case-information";
 import UploadFiles from "./caseform-tabs/upload-files";
 import Fee from "./caseform-tabs/fee";
 import Preview from "./caseform-tabs/preview";
 import Submit from "./caseform-tabs/submit";
+import Header from "./caseform-header";
 
 const TABS = [
   "1. General Information",
@@ -16,30 +16,18 @@ const TABS = [
   "6. Submit",
 ];
 
-function Header({ onClose }: { onClose: () => void }) {
-  return (
-    <header className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-      <div>
-        <h2 className="text-lg font-semibold text-slate-900">
-          Create New Case
-        </h2>
-      </div>
-      <button
-        onClick={onClose}
-        className="p-2 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors"
-      >
-        <X className="w-5 h-5" />
-      </button>
-    </header>
-  );
-}
+
 
 function CaseForm({ onClose }: { onClose: () => void }) {
   const [activeTab, setActiveTab] = useState(TABS[0]);
+  const [isMaximized, setIsMaximized] = useState(false);
 
   return (
-    <div className="relative bg-white w-full max-w-5/6 h-5/6 rounded-2xl shadow-2xl border border-slate-200 z-10 overflow-hidden flex flex-col">
-      <Header onClose={onClose} />
+    <div className={`relative bg-white  w-5/6 h-5/6 rounded-2xl shadow-2xl border border-slate-200 z-10 overflow-hidden flex flex-col ${isMaximized 
+            ? "w-full h-full rounded-none" 
+            : "w-5/6 h-5/6"
+          }`}>
+      <Header onClose={onClose} onToggleExpand={() => setIsMaximized(!isMaximized)} isMaximized={isMaximized} />
 
       {/* Tab Navigation Bar */}
       <div className="flex border-b border-slate-100 bg-white overflow-x-auto no-scrollbar">
