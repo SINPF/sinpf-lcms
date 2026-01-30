@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 function Header() {
     return ( 
         <header className="bg-white border-b border-slate-200 p-6 pr-8 pl-8 flex items-center justify-end gap-4">
@@ -13,6 +15,7 @@ function Header() {
                         BT
                     </span>
                 </div>
+                <Link href={'/login'} className="text-slate-400 "><span className="mr-4 ml-4">|</span> sign out</Link>
             </div>
         </header>
     );
