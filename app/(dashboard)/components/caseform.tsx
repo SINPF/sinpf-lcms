@@ -1,118 +1,89 @@
-import { X, Briefcase, Calendar, AlertCircle, User, AlignLeft } from "lucide-react";
+import { useState } from "react";
+import { X } from "lucide-react";
+import General from "./caseform-tabs/general";
+import CaseInformation from "./caseform-tabs/case-information";
+import UploadFiles from "./caseform-tabs/upload-files";
+import Fee from "./caseform-tabs/fee";
+import Preview from "./caseform-tabs/preview";
+import Submit from "./caseform-tabs/submit";
+
+const TABS = [
+  "1. General Information",
+  "2. Case Information",
+  "3. Upload Files",
+  "4. Fee",
+  "5. Preview",
+  "6. Submit",
+];
+
+function Header({ onClose }: { onClose: () => void }) {
+  return (
+    <header className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+      <div>
+        <h2 className="text-lg font-semibold text-slate-900">
+          Create New Case
+        </h2>
+      </div>
+      <button
+        onClick={onClose}
+        className="p-2 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors"
+      >
+        <X className="w-5 h-5" />
+      </button>
+    </header>
+  );
+}
 
 function CaseForm({ onClose }: { onClose: () => void }) {
+  const [activeTab, setActiveTab] = useState(TABS[0]);
+
   return (
-    <div className="relative bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 z-10 overflow-hidden">
-      {/* Header */}
-      <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-        <div>
-          <h2 className="text-lg font-semibold text-slate-900">Create New Case</h2>
-          <p className="text-[11px] font-medium uppercase tracking-widest text-slate-500 mt-1">
-            Manual Entry Mode
-          </p>
-        </div>
-        <button 
-          onClick={onClose} 
-          className="p-2 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
+    <div className="relative bg-white w-full max-w-5/6 h-5/6 rounded-2xl shadow-2xl border border-slate-200 z-10 overflow-hidden flex flex-col">
+      <Header onClose={onClose} />
+
+      {/* Tab Navigation Bar */}
+      <div className="flex border-b border-slate-100 bg-white overflow-x-auto no-scrollbar">
+        {TABS.map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-all ${
+              activeTab === tab
+                ? "border-[#002B5C] text-[#002B5C] bg-blue-50/30"
+                : "border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
 
-      <form className="p-8 space-y-6 max-h-[80vh] overflow-y-auto">
-        {/* Section: Basic Info */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 text-slate-400 mb-1">
-            <Briefcase className="w-4 h-4" />
-            <span className="text-xs font-semibold uppercase tracking-wider">Basic Information</span>
-          </div>
-          
-          <input 
-            type="text" 
-            placeholder="Case Title / Subject" 
-            className="w-full border-b border-slate-200 py-2 focus:outline-none focus:border-blue-600 transition-all text-lg font-medium placeholder:text-slate-300"
-          />
+      <form className="p-8 space-y-6 max-h-[70vh] overflow-y-auto flex-1">
+        {/* Render content based on activeTab */}
+        <div className="min-h-100 animate-in fade-in slide-in-from-bottom-2 duration-300 border-3 border-dashed p-4">
+          {/* Tab Title - Optional since the tab bar already shows this */}
+          <h3 className="text-xl font-bold text-slate-800 mb-6">{activeTab}</h3>
 
-          <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-1">
-              <label className="text-xs text-slate-500 font-medium ml-1">Case Type</label>
-              <select className="w-full bg-transparent border-b border-slate-200 py-2 focus:outline-none focus:border-blue-600 appearance-none cursor-pointer">
-                <option value="">Select Type...</option>
-                <option value="legal">Legal</option>
-                <option value="medical">Medical</option>
-                <option value="insurance">Insurance</option>
-                <option value="internal">Internal Investigation</option>
-              </select>
-            </div>
-            
-            <div className="space-y-1">
-              <label className="text-xs text-slate-500 font-medium ml-1 flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" /> Priority
-              </label>
-              <select className="w-full bg-transparent border-b border-slate-200 py-2 focus:outline-none focus:border-blue-600 appearance-none cursor-pointer font-medium text-amber-600">
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-                <option value="urgent">Urgent</option>
-              </select>
-            </div>
+          <div className="w-full">
+            {(() => {
+              switch (activeTab) {
+                case "1. General":
+                  return <General />;
+                case "2. Case Information":
+                  return <CaseInformation />;
+                case "3. Upload Files":
+                  return <UploadFiles />;
+                case "4. Fee":
+                  return <Fee />;
+                case "5. Preview":
+                  return <Preview/>
+                case "6. Submit":
+                  return <Submit/>
+                default:
+                  return <General />;
+              }
+            })()}
           </div>
-        </div>
-
-        {/* Section: Assignments & Dates */}
-        <div className="grid grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-slate-400 mb-1">
-              <User className="w-4 h-4" />
-              <span className="text-xs font-semibold uppercase tracking-wider">Assignment</span>
-            </div>
-            <select className="w-full bg-transparent border-b border-slate-200 py-2 focus:outline-none focus:border-blue-600 appearance-none">
-              <option value="">Assign to Lead...</option>
-              <option value="1">John Doe</option>
-              <option value="2">Sarah Smith</option>
-            </select>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-slate-400 mb-1">
-              <Calendar className="w-4 h-4" />
-              <span className="text-xs font-semibold uppercase tracking-wider">Due Date</span>
-            </div>
-            <input 
-              type="date" 
-              className="w-full bg-transparent border-b border-slate-200 py-2 focus:outline-none focus:border-blue-600"
-            />
-          </div>
-        </div>
-
-        {/* Section: Description */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 text-slate-400 mb-1">
-            <AlignLeft className="w-4 h-4" />
-            <span className="text-xs font-semibold uppercase tracking-wider">Case Description</span>
-          </div>
-          <textarea 
-            rows={3}
-            placeholder="Detailed notes regarding the case background..." 
-            className="w-full bg-slate-50 rounded-xl p-4 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all resize-none"
-          />
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-3 pt-4">
-          <button 
-            type="button"
-            onClick={onClose}
-            className="flex-1 px-6 py-3 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition-colors"
-          >
-            Cancel
-          </button>
-          <button 
-            type="submit"
-            className="flex-2 bg-[#002B5C] text-white py-3 rounded-xl font-medium shadow-lg shadow-blue-900/20 hover:bg-[#001f42] transition-all"
-          >
-            Create Case
-          </button>
         </div>
       </form>
     </div>
