@@ -10,7 +10,7 @@ function Sidebar() {
         <NavMenu />
       </div>
 
-      <div className="mt-auto p-6">
+      <div className="mt-auto border-t flex justify-center p-6">
         <SignOutButton />
       </div>
     </aside>
