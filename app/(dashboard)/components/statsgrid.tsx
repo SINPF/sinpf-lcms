@@ -7,7 +7,7 @@ import StatCard from "./statcard";
 
 const stats = [
   {
-    label: "Cases",
+    label: "Contributions",
     description: "active cases",
     value: "10",
     icon: Gavel,
@@ -16,18 +16,45 @@ const stats = [
     accentColor: "bg-blue-400",
   },
   {
-    label: "Account",
-    description: "account balance",
-    value: "$12,003.00",
+    label: "Surcharges",
+    description: "active cases",
+    value: "45",
     icon: Wallet,
     bgColor: "bg-indigo-950", // Deep, almost black-purple
     borderColor: "border-indigo-900",
-    accentColor: "bg-indigo-400", // Bright neon violet pulse
+    accentColor: "bg-slate-200", // Bright neon violet pulse
+  },
+   {
+    label: "Wages",
+    description: "active cases",
+    value: "10",
+    icon: Gavel,
+    bgColor: "bg-blue-900",
+    borderColor: "border-blue-800",
+    accentColor: "bg-blue-400",
   },
   {
-    label: "Hearings",
-    description: "Scheduled and recent hearings",
-    value: "45",
+    label: "Trade dispute panel",
+    description: "active cases",
+    value: "12",
+    icon: Scale, // Swapped from FileText to Scale (Legal proceedings)
+    bgColor: "bg-emerald-900",
+    borderColor: "border-emerald-800",
+    accentColor: "bg-emerald-400",
+  },
+   {
+    label: "Land and Titles",
+    description: "active cases",
+    value: "2",
+    icon: Scale, // Swapped from FileText to Scale (Legal proceedings)
+    bgColor: "bg-emerald-900",
+    borderColor: "border-emerald-800",
+    accentColor: "bg-emerald-400",
+  },
+  {
+    label: "Rental Defaulters",
+    description: "active cases",
+    value: "2",
     icon: Scale, // Swapped from FileText to Scale (Legal proceedings)
     bgColor: "bg-emerald-900",
     borderColor: "border-emerald-800",

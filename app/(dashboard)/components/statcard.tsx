@@ -14,7 +14,7 @@ interface StatCardProps {
 
 function StatCard({ stat }: StatCardProps) {
     return (
-        <div className={` relative overflow-hidden ${stat.bgColor} ${stat.borderColor} border p-6 rounded-xl shadow-xl transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 group cursor-default min-h-35 flex flex-col justify-center`}>
+        <div className={` relative overflow-hidden bg-slate-500 border p-6 rounded-xl shadow-xl transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 group cursor-default min-h-35 flex flex-col justify-center`}>
             
           
 
@@ -26,7 +26,7 @@ function StatCard({ stat }: StatCardProps) {
                         <div className="shrink-0 w-8 h-8 rounded-lg bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white">
                             <stat.icon className="w-4 h-4 opacity-70" />
                         </div>
-                        <h2 className="text-xl font-black text-white tracking-tight uppercase">
+                        <h2 className="text-xl font-black text-white tracking-tight capitalize">
                             {stat.label}
                         </h2>
                     </div>
@@ -46,7 +46,7 @@ function StatCard({ stat }: StatCardProps) {
 
             {/* Bottom Accent Line */}
             <div className="absolute bottom-0 left-0 w-full h-0.75 bg-white/5">
-                <div className={`h-full w-0 group-hover:w-full transition-all duration-700 ease-out ${stat.accentColor}`} />
+                <div className={`h-full w-0 group-hover:w-full`} />
             </div>
         </div>
     )

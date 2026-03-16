@@ -3,8 +3,6 @@ import NavLink from './navlink';
 const menuItems = [
   { iconName: "home", label: "Home", url: "/" },
   { iconName: "cases", label: "Cases", url: "/cases" },
-  { iconName: "filings", label: "Filings", url: "/filings" },
-  { iconName: "reports", label: "Reports", url: "/reports" },
 ];
 
 export default function NavMenu() {
