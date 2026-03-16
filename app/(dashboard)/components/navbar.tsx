@@ -30,7 +30,7 @@ function NavBar() {
             <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#002B5C] transition-colors" />
             <input
               type="text"
-              placeholder="Search ID, status, or name..."
+              placeholder="Search case number, case name, or party..."
               className="w-full pl-8 pr-4 py-2.5 bg-white border-b border-transparent text-slate-900 font-semibold text-sm 
                    placeholder:text-slate-400 placeholder:font-normal
                    focus:outline-none focus:border-b-[#569dee] focus:ring-0

@@ -2,13 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Scale, FileText, LucideIcon } from 'lucide-react';
+import { LayoutDashboard, Scale, FileText, LucideIcon, Search } from 'lucide-react';
 
 const ICONS: Record<string, LucideIcon> = {
   home: LayoutDashboard,
   cases: Scale,
-  filings: FileText,
-  reports: FileText,
+  registry: Search,
 };
 
 interface NavLinkProps {

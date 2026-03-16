@@ -8,8 +8,8 @@ function Table() {
         <table className="w-full text-left border-collapse">
           <thead className="bg-slate-50 border-b border-slate-100">
             <tr className="tracking-tight text-slate-700">
-              <th className="px-6 py-4 font-medium">Case Identifier</th>
-              <th className="px-6 py-4 font-medium">Primary Parties</th>
+              <th className="px-6 py-4 font-medium">Case Number</th>
+              <th className="px-6 py-4 font-medium">Parties</th>
               <th className="px-6 py-4 font-medium">Status</th>
               <th className="px-6 py-4 font-medium text-right">Actions</th>
               <th className="px-6 py-4 w-10"></th>
@@ -18,8 +18,8 @@ function Table() {
           <tbody className="text-sm divide-y divide-slate-50 font-body">
             {[
               { id: "LC-2026-001", name: "SINPF vs. Honiara Logistics", status: "Active" },
-              { id: "LC-2026-042", name: "Member Claim: J. Doe", status: "Review" },
-              { id: "LC-2025-899", name: "Compliance Audit: Area 4", status: "Closed" },
+              { id: "LC-2026-042", name: "Member Claim: J. Doe", status: "Active" },
+              { id: "LC-2025-899", name: "Compliance Audit: Area 4", status: "Active" },
             ].map((row, i) => (
               <tr key={i} className="group hover:bg-slate-50/50 transition-colors">
                 <td className="px-6 py-5 font-mono text-[11px] text-slate-400 tracking-tighter">
