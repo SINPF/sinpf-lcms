@@ -8,13 +8,12 @@ export default function Page() {
   {/* The parent must have relative positioning and a set height/width for 'fill' to work */}
   <div className="relative h-16 w-48"> 
     <Image
-      src="/logo.png"
+      src="/sinpf-logo.png"
       alt="SINPF Logo" 
       fill
       sizes="(max-width: 768px) 100vw, 200px"
       className="object-contain"
       priority // Highly recommended for logos/LCP elements
-      unoptimized
     />
   </div>
 </div>
