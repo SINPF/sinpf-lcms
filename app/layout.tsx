@@ -22,8 +22,11 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VERDICT | SINPF",
+  title: "LCMS | SINPF",
   description: "Legal Case Management Portal",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({

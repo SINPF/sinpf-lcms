@@ -30,11 +30,11 @@ function CaseForm({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className={`relative bg-white w-5/6 h-5/6 rounded-2xl shadow-2xl border border-slate-200 z-10 overflow-hidden flex flex-col ${isMaximized ? "w-full h-full rounded-none" : "w-5/6 h-5/6"}`}>
+    <div className={`relative bg-gradient-to-br from-white to-blue-50 w-5/6 h-5/6 rounded-2xl shadow-2xl border border-blue-200 z-10 overflow-hidden flex flex-col ${isMaximized ? "w-full h-full rounded-none" : "w-5/6 h-5/6"}`}>
       <Header onClose={onClose} onToggleExpand={() => setIsMaximized(!isMaximized)} isMaximized={isMaximized} />
 
       <form onSubmit={handleSubmit} className="p-8 space-y-8 overflow-y-auto flex-1">
-        <div className="min-h-100 animate-in fade-in slide-in-from-bottom-2 duration-300 border-3 border-dashed p-6 rounded-3xl">
+          <div className="min-h-100 animate-in fade-in slide-in-from-bottom-2 duration-300 border-3 border-dashed border-blue-200 p-6 rounded-3xl bg-white/50">
           <h3 className="text-2xl font-bold text-slate-900 mb-4">Employee Information</h3>
           <General
             employerName={employerName}

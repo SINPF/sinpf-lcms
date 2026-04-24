@@ -6,28 +6,20 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen w-full bg-[#F8FAFC] flex items-center justify-center p-6 relative font-sans overflow-hidden">
+    <div className="min-h-screen w-full flex items-center justify-center p-6 relative font-sans overflow-hidden">
       
-      {/* Mesh & Grid Background */}
+      {/* Background Image with Subtle Overlay */}
       <div className="absolute inset-0 z-0">
-        {/* Dynamic Mesh Blobs */}
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#002B5C]/5 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-100/40 blur-[120px]" />
-        <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] rounded-full bg-slate-200/50 blur-[100px]" />
+        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-10" style={{backgroundImage: "url('/bg.jpg')"}} />
+        <div className="absolute inset-0 bg-linear-to-br from-slate-50 to-slate-100" />
         
-        {/* The Grid Overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-size-[3rem_3rem] mask-[radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-40" />
+        {/* Subtle Grid Overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-size-[3rem_3rem] mask-[radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-20" />
       </div>
 
       <div className="relative z-10 w-full max-w-100">
         {/* Header: Minimal & Balanced */}
         <div className="flex flex-col items-center mb-10">
-          <div className="mb-6">
-            <div className="bg-[#002B5C] px-4 py-1.5 rounded-lg shadow-sm">
-              <span className="text-white font-bold text-lg tracking-widest">SINPF</span>
-            </div>
-          </div>
-          
           <div className="text-center">
             <h1 className="text-slate-900 text-xl font-semibold tracking-tight">
               Legal Case Management
@@ -39,7 +31,7 @@ export default function AuthLayout({
         </div>
 
         {/* Content Card: Sharp & Elevated */}
-        <div className="bg-white/80 border border-slate-200 backdrop-blur-md rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+        <div className="bg-white border border-slate-200 backdrop-blur-md rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
           <div className="p-1">
              {children}
           </div>

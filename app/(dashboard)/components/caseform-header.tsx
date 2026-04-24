@@ -8,10 +8,10 @@ interface HeaderProps {
 
 function Header({ onClose, onToggleExpand, isMaximized }: HeaderProps) {
   const iconClasses = "w-5 h-5 transition-transform duration-200 active:scale-90";
-  const buttonClasses = "p-2 rounded-lg hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-all flex items-center justify-center";
+  const buttonClasses = "p-2 rounded-lg hover:bg-blue-100 text-slate-400 hover:text-blue-600 transition-all flex items-center justify-center";
 
   return (
-    <header className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+    <header className="p-6 border-b border-blue-200 flex justify-between items-center bg-blue-50/50">
       <div>
         <h2 className="text-lg font-bold text-slate-900 tracking-tight">
           Create New Case

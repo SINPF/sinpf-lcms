@@ -23,7 +23,7 @@ function FinancialDetails({
   files: File[];
   setFiles: (files: File[]) => void;
 }) {
-  const inputClasses = "w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-[#002B5C] transition-all";
+  const inputClasses = "w-full px-4 py-3 rounded-xl border border-blue-200 bg-white text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all";
   const labelClasses = "block text-sm font-semibold text-slate-700 mb-2 ml-1";
   const isWagesRecordSelected = selectedTypes.includes("Wages record");
 
