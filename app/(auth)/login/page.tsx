@@ -1,5 +1,4 @@
 import Image from "next/image";
-import logo from "@/public/logo.png";
 
 export default function Page() {
   return (
@@ -9,7 +8,7 @@ export default function Page() {
   {/* The parent must have relative positioning and a set height/width for 'fill' to work */}
   <div className="relative h-16 w-48"> 
     <Image
-      src={logo}
+      src="/logo.png"
       alt="SINPF Logo" 
       fill
       sizes="(max-width: 768px) 100vw, 200px"
