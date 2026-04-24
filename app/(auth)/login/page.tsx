@@ -14,6 +14,7 @@ export default function Page() {
       sizes="(max-width: 768px) 100vw, 200px"
       className="object-contain"
       priority // Highly recommended for logos/LCP elements
+      unoptimized
     />
   </div>
 </div>
