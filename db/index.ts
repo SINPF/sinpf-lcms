@@ -1,10 +1,6 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import { migrate } from "drizzle-orm/node-postgres/migrator";
-import { Pool } from "pg";
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+const sql = neon(process.env.DATABASE_URL!);
 
-export const db = drizzle(pool);
-await migrate(db, { migrationsFolder: "./db/migrations" });
+export const db = drizzle(sql);
