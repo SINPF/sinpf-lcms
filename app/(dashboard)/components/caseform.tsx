@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import General from "./caseform-tabs/general";
 import FinancialDetails from "./caseform-tabs/financial-details";
 import Header from "./caseform-header";
@@ -30,7 +30,7 @@ function CaseForm({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className={`relative bg-gradient-to-br from-white to-blue-50 w-5/6 h-5/6 rounded-2xl shadow-2xl border border-blue-200 z-10 overflow-hidden flex flex-col ${isMaximized ? "w-full h-full rounded-none" : "w-5/6 h-5/6"}`}>
+    <div className={`relative bg-linear-to-br from-white to-blue-50 w-5/6 h-5/6 rounded-2xl shadow-2xl border border-blue-200 z-10 overflow-hidden flex flex-col ${isMaximized ? "w-full h-full rounded-none" : "w-5/6 h-5/6"}`}>
       <Header onClose={onClose} onToggleExpand={() => setIsMaximized(!isMaximized)} isMaximized={isMaximized} />
 
       <form onSubmit={handleSubmit} className="p-8 space-y-8 overflow-y-auto flex-1">

@@ -2,7 +2,7 @@ import SignOutButton from "@/components/signout-button";
 
 function Header() {
     return ( 
-        <header className="bg-gradient-to-r from-white to-blue-50 border-b border-blue-200 p-6 pr-8 pl-8 flex items-center justify-end gap-4 shadow-sm">
+        <header className="bg-linear-to-r from-white to-blue-50 border-b border-blue-200 p-6 pr-8 pl-8 flex items-center justify-end gap-4 shadow-sm">
             <div className="flex items-center gap-3">
                 {/* Welcome Text */}
                 <h1 className="text-slate-500 text-sm font-light tracking-tight">

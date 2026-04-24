@@ -12,7 +12,7 @@ export default function DashboardLayout({
 
       <main className="flex-1 relative overflow-y-auto">
         {/* Visible Mesh Glow Container */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 bg-linear-to-br from-blue-50 to-indigo-100">
     
 
         </div>
