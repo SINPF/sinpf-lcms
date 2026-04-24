@@ -1,16 +1,22 @@
-import React from 'react';
+import Image from "next/image";
 
 export default function Page() {
   return (
     <div className="bg-white rounded-2xl p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200">
       {/* Logo Section */}
       <div className="flex justify-center mb-6">
-        <img 
-          src="/logo.png" 
-          alt="SINPF Logo" 
-          className="h-16 w-auto"
-        />
-      </div>
+  {/* The parent must have relative positioning and a set height/width for 'fill' to work */}
+  <div className="relative h-16 w-48"> 
+    <Image
+      src="/logo.png" 
+      alt="SINPF Logo" 
+      fill
+      sizes="(max-width: 768px) 100vw, 200px"
+      className="object-contain"
+      priority // Highly recommended for logos/LCP elements
+    />
+  </div>
+</div>
 
       <div className="mb-10 text-center">
         <p className="text-slate-600 text-sm">
