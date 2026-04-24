@@ -5,7 +5,7 @@ function Page() {
     return ( 
         <>
         <NavBar/>
-        <Table/>
+        {/* <Table/> */}
         </>
      );
 }

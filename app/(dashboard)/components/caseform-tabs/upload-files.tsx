@@ -6,24 +6,23 @@ const instructions = {
   title: 'Upload Documents',
   instructions: [
     'You can upload your <strong>supporting evidence</strong> and <strong>exhibits</strong> here.',
-    'Accepted formats: <strong>PDF, DOCX, and JPEG</strong>. Max size: 10MB per file.',
+    'Accepted formats: <strong>PDF, Excel, and CSV</strong>. Max size: 10MB per file.',
     'You can select multiple files at once using the browse button.'
   ]
 };
 
-function UploadFiles() {
-  const [files, setFiles] = useState<File[]>([]);
+function UploadFiles({ files, setFiles }: { files: File[]; setFiles: (files: File[]) => void }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const selectedFiles = Array.from(e.target.files);
-      setFiles((prev) => [...prev, ...selectedFiles]);
+      setFiles([...files, ...selectedFiles]);
     }
   };
 
   const removeFile = (index: number) => {
-    setFiles((prev) => prev.filter((_, i) => i !== index));
+    setFiles(files.filter((_, i) => i !== index));
   };
 
   const triggerBrowse = () => {
@@ -50,7 +49,7 @@ function UploadFiles() {
           onChange={handleFileChange}
           multiple
           className="hidden"
-          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+          accept=".pdf,.xlsx,.xls,.csv"
         />
 
         <button

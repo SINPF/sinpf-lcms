@@ -1,6 +1,5 @@
 import BrandArea from "./brand-area";
 import NavMenu from "./navmenu";
-import SignOutButton from "@/components/signout-button";
 
 function Sidebar() {
   return (
@@ -10,9 +9,7 @@ function Sidebar() {
         <NavMenu />
       </div>
 
-      <div className="mt-auto border-t flex justify-center p-6">
-        <SignOutButton />
-      </div>
+      
     </aside>
   );
 }
