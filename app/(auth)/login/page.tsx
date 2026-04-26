@@ -1,26 +1,34 @@
-"use client"; // 1. Necessary for interactive elements
+"use client"; 
 
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
-import { useState } from "react"; // 2. Import useState to hold the email
+import { useRouter } from "next/navigation";
+import { useState } from "react"; 
 
 export default function Page() {
-  const [email, setEmail] = useState(""); // 3. The "grabber" state
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const signInHandler = async (e: React.SubmitEvent) => {
-    console.log(email)
-    e.preventDefault(); // 4. Prevent the page from refreshing
-    
-    const { data, error} = await authClient.emailOtp.sendVerificationOtp({
-      email: email, 
-      type: "sign-in",
-    });
+  const signInHandler = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
-    if (error) {
-      console.error("Login failed:", error.message);
-      alert(error.message);
-    } else {
-      alert("Check your email for the code!");
+    try {
+      const { error } = await authClient.emailOtp.sendVerificationOtp({
+        email,
+        type: "sign-in",
+      });
+
+      if (error) {
+        setError(error.message ?? "Something went wrong. Please try again.");
+      } else {
+        router.push(`/verify?email=${encodeURIComponent(email)}`);
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -45,7 +53,6 @@ export default function Page() {
         </p>
       </div>
 
-      {/* 6. Use onSubmit on the form instead of onClick on the button */}
       <form onSubmit={signInHandler} className="space-y-6">
         <div>
           <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
@@ -57,17 +64,33 @@ export default function Page() {
             name="email"
             placeholder="Enter your email"
             required
-            value={email} // 7. Bind the value to state
-            onChange={(e) => setEmail(e.target.value)} // 8. Update state as user types
-            className="w-full px-4 py-2.5 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-black"
+            value={email}
+            onChange={(e) => { setEmail(e.target.value); setError(""); }}
+            className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 text-black transition-colors duration-200
+              ${error
+                ? "border-red-400 focus:ring-red-500/20 focus:border-red-500"
+                : "border-blue-200 focus:ring-blue-500/20 focus:border-blue-500"
+              }`}
           />
+
+          {error && (
+            <p className="mt-2 text-sm text-red-600 font-medium">{error}</p>
+          )}
         </div>
 
         <button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-6 rounded-lg font-semibold transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/20 active:scale-[0.98]"
+          disabled={isLoading}
+          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white py-2.5 px-6 rounded-lg font-semibold transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/20 active:scale-[0.98] flex items-center justify-center gap-2"
         >
-          Sign In
+          {isLoading ? (
+            <>
+              <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Sending code…
+            </>
+          ) : (
+            "Send One-Time Code"
+          )}
         </button>
       </form>
     </div>
