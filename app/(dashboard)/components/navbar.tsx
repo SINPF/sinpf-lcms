@@ -1,12 +1,4 @@
-import {
-  Search,
-  Filter,
-  LayoutGrid,
-  List,
-  Download,
-  Plus,
-  ChevronDown,
-} from "lucide-react";
+import { Search, Plus } from "lucide-react";
 import Link from "next/link";
 
 function NavBar() {

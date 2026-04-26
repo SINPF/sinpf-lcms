@@ -188,7 +188,7 @@ function VerifyForm() {
 
       {/* Resend */}
       <p className="mt-6 text-center text-sm text-slate-500">
-        Didn't receive the code?{" "}
+        Didn&apos;t receive the code?{" "}
         <button
           type="button"
           onClick={handleResend}

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ArrowRight, FileCheck } from "lucide-react";
 
 function Submit({ selectedTypes, files, onSubmit }: { selectedTypes: string[]; files: File[]; onSubmit: () => void }) {
-  const [agreed, setAgreed] = useState(false);
+  const [agreed] = useState(false);
 
   const isWagesRecordSelected = selectedTypes.includes("Wages record");
   const hasFiles = files.length > 0;

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import { Upload, File, X, Paperclip } from "lucide-react";
 import Instructions from "./components/instructions";
 
