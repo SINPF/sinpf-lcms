@@ -3,11 +3,11 @@
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useRef, useState, KeyboardEvent, ClipboardEvent } from "react";
+import { Suspense, useRef, useState, KeyboardEvent, ClipboardEvent } from "react";
 
 const OTP_LENGTH = 6;
 
-export default function Page() {
+function VerifyForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email") ?? "";
@@ -208,5 +208,19 @@ export default function Page() {
         </a>
       </p>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense
+      fallback={
+        <div className="bg-white rounded-2xl p-10 border border-slate-200 flex justify-center items-center min-h-[320px]">
+          <span className="inline-block w-6 h-6 border-2 border-slate-200 border-t-blue-500 rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <VerifyForm />
+    </Suspense>
   );
 }
