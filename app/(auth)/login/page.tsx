@@ -33,7 +33,7 @@ export default function Page() {
   };
 
   return (
-    <div className="bg-white rounded-2xl p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200">
+    <div className="bg-background/80 dark:bg-slate-900/60 rounded-2xl p-10 shadow-xl border border-border backdrop-blur-md">
       <div className="flex justify-center mb-6">
         <div className="relative h-16 w-48">
           <Image
@@ -41,21 +41,21 @@ export default function Page() {
             alt="SINPF Logo"
             fill
             sizes="(max-width: 768px) 100vw, 200px"
-            className="object-contain"
+            className="object-contain dark:brightness-110"
             priority
           />
         </div>
       </div>
 
       <div className="mb-10 text-center">
-        <p className="text-slate-600 text-sm">
+        <p className="text-muted-foreground text-sm font-sans">
           Welcome back. Please sign in to access case files.
         </p>
       </div>
 
       <form onSubmit={signInHandler} className="space-y-6">
         <div>
-          <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
+          <label htmlFor="email" className="block text-sm font-bold text-foreground mb-2 font-sans">
             Email Address
           </label>
           <input
@@ -66,26 +66,27 @@ export default function Page() {
             required
             value={email}
             onChange={(e) => { setEmail(e.target.value); setError(""); }}
-            className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 text-black transition-colors duration-200
+            className={`w-full px-4 py-2.5 bg-background border rounded-lg focus:outline-none focus:ring-2 text-foreground transition-colors duration-200 font-sans
               ${error
-                ? "border-red-400 focus:ring-red-500/20 focus:border-red-500"
-                : "border-blue-200 focus:ring-blue-500/20 focus:border-blue-500"
+                ? "border-red-500 focus:ring-red-500/20 focus:border-red-500"
+                : "border-border focus:ring-primary/20 focus:border-primary"
               }`}
           />
 
           {error && (
-            <p className="mt-2 text-sm text-red-600 font-medium">{error}</p>
+            <p className="mt-2 text-sm text-red-500 font-semibold">{error}</p>
           )}
         </div>
 
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white py-2.5 px-6 rounded-lg font-semibold transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/20 active:scale-[0.98] flex items-center justify-center gap-2"
+          className="w-full bg-primary hover:opacity-90 disabled:bg-primary/50 disabled:cursor-not-allowed text-primary-foreground py-2.5 px-6 rounded-lg font-bold transition-all duration-300 shadow-lg shadow-primary/20 active:scale-[0.98] flex items-center justify-center gap-2 font-heading"
         >
           {isLoading ? (
             <>
-              <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              {/* Using brand gold for the loading spinner for high-visibility brand touch */}
+              <span className="inline-block w-4 h-4 border-2 border-secondary/30 border-t-secondary rounded-full animate-spin" />
               Sending code…
             </>
           ) : (

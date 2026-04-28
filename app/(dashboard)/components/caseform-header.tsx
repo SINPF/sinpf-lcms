@@ -7,25 +7,32 @@ interface HeaderProps {
 }
 
 function Header({ onClose, onToggleExpand, isMaximized }: HeaderProps) {
-  const iconClasses = "w-5 h-5 transition-transform duration-200 active:scale-90";
-  const buttonClasses = "p-2 rounded-lg hover:bg-blue-100 text-slate-400 hover:text-blue-600 transition-all flex items-center justify-center";
+  // Use theme-aware classes for icons and buttons
+  const iconClasses = "w-4 h-4 transition-transform duration-200 active:scale-90";
+  
+  // buttonClasses now use semantic muted background and foreground tokens
+  const buttonClasses = "p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-all flex items-center justify-center border border-transparent hover:border-border";
 
   return (
-    <header className="p-6 border-b border-blue-200 flex justify-between items-center bg-blue-50/50">
+    <header className="px-8 py-5 border-b border-border flex justify-between items-center bg-background transition-colors duration-300">
       <div>
-        <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+        <h2 className="text-lg font-bold text-foreground tracking-tight font-heading">
           Create New Case
         </h2>
-        <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
-          Legal Filing Portal
-        </p>
+        <div className="flex items-center gap-2">
+          {/* Brand Indicator Dot */}
+          <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+          <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-70">
+            Legal Filing Portal
+          </p>
+        </div>
       </div>
 
-      <div className="flex items-center gap-1">
-        {/* Expand / Minimize Toggle */}
+      <div className="flex items-center gap-2">
+        {/* Expand / Minimize Toggle - Uses Brand Gold on hover for a premium touch */}
         <button
           onClick={onToggleExpand}
-          className={buttonClasses}
+          className={`${buttonClasses} hover:bg-secondary/10 hover:text-secondary-foreground hover:border-secondary/20`}
           title={isMaximized ? "Restore" : "Maximize"}
         >
           {isMaximized ? (
@@ -35,10 +42,10 @@ function Header({ onClose, onToggleExpand, isMaximized }: HeaderProps) {
           )}
         </button>
 
-        {/* Close Button */}
+        {/* Close Button - Uses a clean muted red for the destructive action */}
         <button
           onClick={onClose}
-          className={`${buttonClasses} hover:bg-red-50 hover:text-red-500`}
+          className={`${buttonClasses} hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20`}
           title="Close"
         >
           <X className={iconClasses} />

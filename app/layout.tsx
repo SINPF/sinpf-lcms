@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Public_Sans, Outfit, Space_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
 
 // Heading Font: Bold, geometric, and very "Badass" for titles
 const outfit = Outfit({
@@ -35,16 +36,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`
           ${outfit.variable} 
           ${publicSans.variable} 
           ${spaceMono.variable} 
-          font-body antialiased bg-[#F8FAFC] text-slate-900
+          antialiased 
+          bg-background 
+          text-foreground
+          font-sans
         `}
       >
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

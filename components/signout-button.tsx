@@ -20,12 +20,13 @@ function SignOutButton() {
     return (
         <button
           onClick={handleSignOut}
-          className="flex items-center gap-2 px-4 py-3 rounded-xl text-slate-500 text-sm transition-all duration-200 group border border-transparent cursor-pointer w-full"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-muted-foreground hover:text-secondary-foreground hover:bg-secondary border border-transparent hover:border-secondary/20 text-sm font-bold transition-all duration-300 group cursor-pointer w-full font-heading active:scale-95"
         >
-          <LogOut className="w-4 h-4" />
+          {/* Icon turns brand-navy on hover for contrast against the gold background */}
+          <LogOut className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
           <span>Logout</span>
         </button>
     );
 }
 
-export default SignOutButton;
+export default SignOutButton;

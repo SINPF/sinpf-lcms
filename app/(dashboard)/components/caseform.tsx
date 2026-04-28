@@ -3,8 +3,6 @@ import General from "./caseform-tabs/general";
 import FinancialDetails from "./caseform-tabs/financial-details";
 import Header from "./caseform-header";
 
-
-
 function CaseForm({ onClose }: { onClose: () => void }) {
   const [isMaximized, setIsMaximized] = useState(false);
 
@@ -30,12 +28,15 @@ function CaseForm({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className={`relative bg-linear-to-br from-white to-blue-50 w-5/6 h-5/6 rounded-2xl shadow-2xl border border-blue-200 z-10 overflow-hidden flex flex-col ${isMaximized ? "w-full h-full rounded-none" : "w-5/6 h-5/6"}`}>
+    /* Updated background and border to use semantic tokens. 
+       Removed hardcoded blue-50 and blue-200. */
+    <div className={`relative bg-background w-5/6 h-5/6 rounded-2xl shadow-2xl border border-border z-10 overflow-hidden flex flex-col transition-all duration-300 ${isMaximized ? "w-full h-full rounded-none" : "w-5/6 h-5/6"}`}>
       <Header onClose={onClose} onToggleExpand={() => setIsMaximized(!isMaximized)} isMaximized={isMaximized} />
 
       <form onSubmit={handleSubmit} className="p-8 space-y-8 overflow-y-auto flex-1">
-          <div className="min-h-100 animate-in fade-in slide-in-from-bottom-2 duration-300 border-3 border-dashed border-blue-200 p-6 rounded-3xl bg-white/50">
-          <h3 className="text-2xl font-bold text-slate-900 mb-4">Employee Information</h3>
+          {/* Dashed container now uses the theme's border and muted background */}
+          <div className="min-h-100 animate-in fade-in slide-in-from-bottom-2 duration-300 border-2 border-dashed border-border p-8 rounded-3xl bg-muted/30">
+          <h3 className="text-2xl font-bold text-foreground mb-6 font-heading">Employer Information</h3>
           <General
             employerName={employerName}
             setEmployerName={setEmployerName}
@@ -47,8 +48,8 @@ function CaseForm({ onClose }: { onClose: () => void }) {
             setSelectedTypes={setSelectedTypes}
           />
 
-          <div className="mt-10">
-            <h3 className="text-2xl font-bold text-slate-900 mb-4">Financial Details</h3>
+          <div className="mt-12">
+            <h3 className="text-2xl font-bold text-foreground mb-6 font-heading">Financial Details</h3>
             <FinancialDetails
               totalContributions={totalContributions}
               setTotalContributions={setTotalContributions}
@@ -65,19 +66,26 @@ function CaseForm({ onClose }: { onClose: () => void }) {
         </div>
 
         {isWagesRecordSelected && files.length === 0 && (
-          <div className="p-4 rounded-2xl bg-yellow-50 border border-yellow-200 text-sm text-yellow-700">
+          /* Warning block uses the secondary color (gold) for high visibility */
+          <div className="p-4 rounded-xl bg-secondary/10 border border-secondary/20 text-sm text-secondary-foreground font-medium">
             Wages Record is selected. Please upload at least one spreadsheet file (PDF, Excel, or CSV) before saving.
           </div>
         )}
 
-        <div className="flex justify-between items-center gap-4">
-          <span className="text-sm text-slate-500">Status: {status || 'Draft'}</span>
+        <div className="flex justify-between items-center gap-4 pt-4">
+          <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
+            Status: <span className="text-primary">{status || 'Draft'}</span>
+          </span>
           <button
             type="submit"
             disabled={!canSave}
-            className={`px-8 py-4 rounded-xl font-bold transition-all shadow-xl ${canSave ? "bg-[#002B5C] text-white hover:bg-[#001f42] shadow-blue-900/20" : "bg-slate-200 text-slate-400 cursor-not-allowed"}`}
+            className={`px-10 py-4 rounded-xl font-bold transition-all shadow-lg font-heading active:scale-95 ${
+              canSave 
+              ? "bg-primary text-primary-foreground hover:opacity-90 shadow-primary/20" 
+              : "bg-muted text-muted-foreground cursor-not-allowed"
+            }`}
           >
-            Save
+            Save Record
           </button>
         </div>
       </form>

@@ -23,12 +23,13 @@ function FinancialDetails({
   files: File[];
   setFiles: (files: File[]) => void;
 }) {
-  const inputClasses = "w-full px-4 py-3 rounded-xl border border-blue-200 bg-white text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all";
-  const labelClasses = "block text-sm font-semibold text-slate-700 mb-2 ml-1";
+  // THEME ALIGNED CLASSES
+  const inputClasses = "w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground/30";
+  const labelClasses = "block text-[11px] font-black text-muted-foreground uppercase tracking-widest mb-2 ml-1";
   const isWagesRecordSelected = selectedTypes.includes("Wages record");
 
   return (
-    <div className="grid-cols-1">
+    <div className="space-y-6">
     
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in duration-500">
         <div className="flex flex-col">
@@ -71,20 +72,35 @@ function FinancialDetails({
         </div>
       </div>
 
-      <div className="mt-6 p-4 bg-slate-50 border border-slate-200 rounded-xl">
-        <div className="flex justify-between items-center">
-          <span className="text-lg font-semibold text-slate-800">Grand Total Claim</span>
-          <span className="text-xl font-bold text-[#002B5C]">${grandTotal.toFixed(2)}</span>
+      {/* Grand Total Claim: Elevated Branded Card */}
+      <div className="mt-8 p-6 bg-accent border border-border/50 rounded-2xl shadow-inner relative overflow-hidden group">
+        {/* Decorative background glow */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl -mr-16 -mt-16 group-hover:bg-primary/20 transition-colors" />
+        
+        <div className="relative z-10 flex justify-between items-center">
+          <div className="flex flex-col">
+            <span className="text-xs font-bold text-accent-foreground/60 uppercase tracking-tighter">Grand Total Claim</span>
+            <span className="text-sm font-medium text-accent-foreground/40 italic">Calculated amount in SBD</span>
+          </div>
+          <span className="text-3xl font-black text-secondary tracking-tighter font-sans">
+            ${grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
         </div>
       </div>
 
       {isWagesRecordSelected && (
-        <div className="mt-10">
-          <h4 className="text-lg font-semibold text-slate-800 mb-4">Upload Supporting Files</h4>
+        <div className="mt-10 pt-6 border-t border-border">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-1 h-4 bg-secondary rounded-full" />
+            <h4 className="text-lg font-bold text-foreground font-heading">Upload Supporting Files</h4>
+          </div>
+          
           <UploadFiles files={files} setFiles={setFiles} />
+          
           {files.length === 0 && (
-            <div className="mt-4 p-4 rounded-2xl bg-yellow-50 border border-yellow-200 text-sm text-yellow-700">
-              Wages Record has been selected. Please upload at least one spreadsheet file (PDF, Excel, or CSV) before saving.
+            <div className="mt-4 p-4 rounded-xl bg-secondary/10 border border-secondary/20 text-sm text-secondary-foreground font-bold flex items-center gap-3">
+              <span className="flex h-2 w-2 rounded-full bg-secondary animate-pulse" />
+              Wages Record selected. Please upload at least one spreadsheet file (PDF, Excel, or CSV).
             </div>
           )}
         </div>

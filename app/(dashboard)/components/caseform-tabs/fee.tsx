@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Trash2, AlertCircle } from "lucide-react";
+import { Plus, Trash2, AlertCircle, ChevronDown } from "lucide-react";
 import Instructions from "./components/instructions";
 
 const feeInstructions = {
@@ -14,6 +14,10 @@ const feeInstructions = {
 function Fee() {
   const [selectedFees, setSelectedFees] = useState([{ label: "", amount: 0 }]);
   const [isWaived, setIsWaived] = useState(false);
+
+  // THEME TOKENS
+  const inputClasses = "w-full p-3.5 bg-background border border-border rounded-xl text-foreground font-medium outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer";
+  const labelClasses = "text-[11px] font-black uppercase tracking-widest text-muted-foreground ml-1";
 
   const addFee = () => {
     setSelectedFees([...selectedFees, { label: "", amount: 0 }]);
@@ -42,15 +46,13 @@ function Fee() {
 
       {/* The List of Fees */}
       <div className="space-y-4">
-        <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500 ml-1">
-          Fee Items
-        </label>
+        <label className={labelClasses}>Fee Items</label>
         
         {selectedFees.map((fee, index) => (
           <div key={index} className="flex gap-4 items-center animate-in slide-in-from-left-2 duration-300">
-            <div className="relative flex-1">
+            <div className="relative flex-1 group">
               <select 
-                className="w-full p-3.5 bg-white border border-slate-200 rounded-xl text-slate-700 font-medium outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-[#002B5C] transition-all appearance-none cursor-pointer"
+                className={inputClasses}
                 value={fee.label}
                 onChange={(e) => updateFee(index, e.target.value)}
               >
@@ -59,21 +61,20 @@ function Fee() {
                 <option value="Service Fee">Service Fee ($50.00)</option>
                 <option value="Search Fee">Search Fee ($20.00)</option>
               </select>
-              {/* Custom Arrow */}
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground group-hover:text-primary transition-colors">
+                <ChevronDown size={18} />
               </div>
             </div>
 
-            <div className="w-32 p-3.5 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 font-bold text-center">
+            {/* Price Chip */}
+            <div className="w-32 p-3.5 bg-secondary/10 border border-secondary/20 rounded-xl text-secondary-foreground font-black text-center shadow-sm">
               ${fee.amount.toFixed(2)}
             </div>
 
             {selectedFees.length > 1 && (
               <button 
                 onClick={() => removeFee(index)} 
-                className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                title="Remove Fee"
+                className="p-2.5 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all active:scale-90"
               >
                 <Trash2 size={20} />
               </button>
@@ -83,37 +84,43 @@ function Fee() {
 
         <button 
           onClick={addFee}
-          className="w-full py-4 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 font-semibold hover:border-[#002B5C] hover:text-[#002B5C] hover:bg-blue-50/30 transition-all flex items-center justify-center gap-2"
+          className="w-full py-4 border-2 border-dashed border-border rounded-xl text-muted-foreground font-bold hover:border-primary hover:text-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-2 group"
         >
-          <Plus size={18} /> Add Another Fee
+          <Plus size={18} className="group-hover:rotate-90 transition-transform" /> Add Another Fee
         </button>
       </div>
 
-      {/* Total and Waiver Card */}
-      <div className="p-8  rounded-2xl   flex flex-col md:flex-row justify-between items-center gap-6">
-        <div className="flex items-center gap-3">
-          <input 
-            type="checkbox" 
-            id="waiver"
-            className="w-5 h-5 rounded border-slate-300 text-blue-500 focus:ring-blue-500/20 cursor-pointer"
-            checked={isWaived} 
-            onChange={() => setIsWaived(!isWaived)} 
-          />
-          <label htmlFor="waiver" className="text-sm font-semibold cursor-pointer select-none ">
-            Request Fee Waiver
+      {/* Total and Waiver Card: SINPF High-Contrast "Badass" Card */}
+      <div className="p-8 bg-accent border border-white/10 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-6 shadow-2xl shadow-primary/10 relative overflow-hidden group">
+        {/* Background Accent Glow */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[80px] -mr-32 -mt-32 rounded-full" />
+
+        <div className="flex items-center gap-4 relative z-10">
+          <div className="relative flex items-center justify-center">
+             <input 
+              type="checkbox" 
+              id="waiver"
+              className="w-6 h-6 rounded-lg border-white/20 bg-white/5 text-secondary focus:ring-secondary/20 cursor-pointer transition-all checked:bg-secondary"
+              checked={isWaived} 
+              onChange={() => setIsWaived(!isWaived)} 
+            />
+          </div>
+          <label htmlFor="waiver" className="flex flex-col cursor-pointer select-none">
+            <span className="text-accent-foreground font-black text-sm uppercase tracking-wider">Request Fee Waiver</span>
+            <span className="text-accent-foreground/50 text-[11px] font-medium italic">Apply for exemption based on criteria</span>
           </label>
         </div>
 
-        <div className="text-center md:text-right">
-          <div className="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-bold mb-1">
+        <div className="text-center md:text-right relative z-10">
+          <div className="text-[10px] uppercase tracking-[0.3em] text-secondary font-black mb-1 opacity-80">
             Total Payable Amount
           </div>
-          <div className={`text-3xl font-bold transition-all ${isWaived ? 'line-through text-slate-500' : 'text-slate-800'}`}>
+          <div className={`text-4xl font-black transition-all tracking-tighter font-heading ${isWaived ? 'line-through text-accent-foreground/20' : 'text-accent-foreground'}`}>
             ${total.toFixed(2)}
           </div>
           {isWaived && (
-            <div className="text-blue-400 text-xs font-bold mt-2 flex items-center justify-center md:justify-end gap-1 animate-pulse">
-              <AlertCircle size={14} /> Waiver Status: Requested
+            <div className="text-secondary text-[11px] font-black mt-2 flex items-center justify-center md:justify-end gap-1.5 animate-pulse uppercase tracking-widest">
+              <AlertCircle size={14} strokeWidth={3} /> Waiver Status: Requested
             </div>
           )}
         </div>

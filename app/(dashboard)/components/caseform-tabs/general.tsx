@@ -1,4 +1,5 @@
 import React from "react";
+import { Check } from "lucide-react";
 
 function General({
   employerName, setEmployerName,
@@ -17,8 +18,9 @@ function General({
 }) {
   const caseTypes = ["Unpaid contributions", "Unpaid surcharges", "Wages record"];
 
-  const inputClasses = "w-full px-4 py-3 rounded-xl border border-blue-200 bg-white text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all";
-  const labelClasses = "block text-sm font-semibold text-slate-700 mb-2 ml-1";
+  // THEME ALIGNED CLASSES
+  const inputClasses = "w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground/30";
+  const labelClasses = "block text-[11px] font-black text-muted-foreground uppercase tracking-widest mb-2 ml-1";
 
   const handleTypeChange = (type: string) => {
     setSelectedTypes(prev =>
@@ -29,9 +31,8 @@ function General({
   };
 
   return (
-    <div className="grid-cols-1">
-    
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-500">
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in duration-500">
 
         {/* Employer Name */}
         <div className="flex flex-col">
@@ -41,7 +42,7 @@ function General({
             value={employerName}
             onChange={(e) => setEmployerName(e.target.value)}
             className={inputClasses}
-            placeholder="Enter employer name"
+            placeholder="e.g. Solomon Islands National University"
           />
         </div>
 
@@ -53,7 +54,7 @@ function General({
             value={employerCode}
             onChange={(e) => setEmployerCode(e.target.value)}
             className={inputClasses}
-            placeholder="Enter alphanumeric code"
+            placeholder="SIN-XXXX-XX"
           />
         </div>
 
@@ -64,25 +65,36 @@ function General({
             type="date"
             value={referralDate}
             onChange={(e) => setReferralDate(e.target.value)}
-            className={inputClasses}
+            className={`${inputClasses} cursor-pointer`}
           />
         </div>
 
-        {/* Type of Case - Multi-select */}
+        {/* Type of Case - Modern Multi-select Chips */}
         <div className="flex flex-col">
           <label className={labelClasses}>Type of Case</label>
-          <div className="space-y-2">
-            {caseTypes.map((type) => (
-              <label key={type} className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={selectedTypes.includes(type)}
-                  onChange={() => handleTypeChange(type)}
-                  className="mr-2"
-                />
-                {type}
-              </label>
-            ))}
+          <div className="flex flex-wrap gap-2">
+            {caseTypes.map((type) => {
+              const isActive = selectedTypes.includes(type);
+              return (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => handleTypeChange(type)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all border ${
+                    isActive
+                      ? "bg-secondary text-secondary-foreground border-secondary shadow-lg shadow-secondary/20"
+                      : "bg-muted/50 text-muted-foreground border-border hover:border-primary/50"
+                  }`}
+                >
+                  <div className={`w-3 h-3 rounded flex items-center justify-center border transition-colors ${
+                    isActive ? "bg-secondary-foreground border-secondary-foreground" : "bg-transparent border-muted-foreground/30"
+                  }`}>
+                    {isActive && <Check className="w-2.5 h-2.5 text-secondary" strokeWidth={4} />}
+                  </div>
+                  {type}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>

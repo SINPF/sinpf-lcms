@@ -6,48 +6,50 @@ interface StatCardProps {
         description: string,
         value: string,
         icon: LucideIcon,
-        bgColor: string,
-        borderColor: string,
-        accentColor: string
     }
 }
 
 function StatCard({ stat }: StatCardProps) {
     return (
-        <div className={` relative overflow-hidden bg-slate-500 border p-6 rounded-xl shadow-xl transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 group cursor-default min-h-35 flex flex-col justify-center`}>
+        <div className="group relative p-5 rounded-xl bg-background border border-border hover:border-primary/50 shadow-sm transition-all duration-300 overflow-hidden cursor-default">
             
-          
+            {/* Background Branding: A subtle, large scale icon watermark */}
+            <stat.icon className="absolute -right-4 -bottom-4 w-24 h-24 text-primary/3 -rotate-12 group-hover:text-primary/6 group-hover:rotate-0 transition-all duration-500" />
 
-            <div className="relative z-10 flex items-center justify-between gap-4">
+            <div className="relative z-10 flex flex-col gap-4">
                 
-                {/* Left Side: Label and Description */}
-                <div className="flex flex-col">
-                    <div className="flex items-center gap-3 mb-1">
-                        <div className="shrink-0 w-8 h-8 rounded-lg bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white">
-                            <stat.icon className="w-4 h-4 opacity-70" />
-                        </div>
-                        <h2 className="text-xl font-black text-white tracking-tight capitalize">
+                {/* Top Row: Icon & Label */}
+                <div className="flex items-start justify-between">
+                    <div className="flex flex-col gap-1">
+                        <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] leading-none">
                             {stat.label}
-                        </h2>
+                        </p>
+                        <p className="text-muted-foreground text-[10px] font-medium leading-none opacity-60">
+                            {stat.description}
+                        </p>
                     </div>
-                    <p className="text-white/40 text-[11px] font-medium tracking-wide pl-11">
-                        {stat.description}
-                    </p>
+                    
+                    {/* Compact Icon Glass-morphism */}
+                    <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center border border-border group-hover:border-primary/30 group-hover:bg-primary/5 transition-colors">
+                        <stat.icon className="w-4 h-4 text-foreground group-hover:text-primary transition-colors" />
+                    </div>
                 </div>
 
-                {/* Right Side: Value */}
-                <div className="flex items-center gap-2">
-                    <h3 className="text-3xl font-black text-white tracking-tighter">
+                {/* Main Content: Big Data Value */}
+                <div className="flex items-baseline gap-2">
+                    <h3 className="text-3xl font-black text-foreground tracking-tighter font-sans">
                         {stat.value}
                     </h3>
-                   
+                    {/* Subtle "Records" unit or status indicator */}
+                    <span className="text-[10px] font-bold text-muted-foreground/40 uppercase">Total</span>
                 </div>
             </div>
 
-            {/* Bottom Accent Line */}
-            <div className="absolute bottom-0 left-0 w-full h-0.75 bg-white/5">
-                <div className={`h-full w-0 group-hover:w-full`} />
-            </div>
+            {/* Left Edge "Legal" Ribbon: Using Brand Gold for Active State */}
+            <div className="absolute top-0 left-0 h-full w-1 bg-muted group-hover:bg-secondary transition-all duration-300 shadow-[2px_0_10px_rgba(255,222,17,0.1)]" />
+
+            {/* Hover Glow Effect */}
+            <div className="absolute inset-0 bg-linear-to-tr from-primary/2 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
     )
 }

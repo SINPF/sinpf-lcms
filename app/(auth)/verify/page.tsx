@@ -16,8 +16,6 @@ function VerifyForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
-  // Ref mirrors otp state so handleSubmit always reads the latest value
-  // even when called synchronously after a setState (e.g. paste + Enter).
   const otpRef = useRef<string[]>(Array(OTP_LENGTH).fill(""));
 
   const focusInput = (index: number) => {
@@ -50,16 +48,12 @@ function VerifyForm() {
     const next = Array(OTP_LENGTH).fill("");
     pasted.split("").forEach((char, i) => { next[i] = char; });
     updateOtp(next);
-    // Focus the last filled box (or last box if fully filled)
     focusInput(Math.min(pasted.length - 1, OTP_LENGTH - 1));
-    // Auto-submit if a complete code was pasted
     if (pasted.length === OTP_LENGTH) {
       submitCode(next);
     }
   };
 
-  // Core verification logic — accepts the digits array directly so it can be
-  // called right after a state update without waiting for re-render.
   const submitCode = async (digits: string[]) => {
     const code = digits.join("");
     if (code.length < OTP_LENGTH) {
@@ -90,8 +84,6 @@ function VerifyForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Always read from the ref — guaranteed to be current even if
-    // React hasn't flushed the latest setState yet.
     await submitCode(otpRef.current);
   };
 
@@ -110,7 +102,7 @@ function VerifyForm() {
   };
 
   return (
-    <div className="bg-white rounded-2xl p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200">
+    <div className="bg-background/80 dark:bg-slate-900/60 rounded-2xl p-10 shadow-xl border border-border backdrop-blur-md">
       {/* Logo */}
       <div className="flex justify-center mb-6">
         <div className="relative h-16 w-48">
@@ -119,7 +111,7 @@ function VerifyForm() {
             alt="SINPF Logo"
             fill
             sizes="(max-width: 768px) 100vw, 200px"
-            className="object-contain"
+            className="object-contain dark:brightness-110"
             priority
           />
         </div>
@@ -127,10 +119,10 @@ function VerifyForm() {
 
       {/* Header */}
       <div className="mb-8 text-center">
-        <h2 className="text-slate-900 text-lg font-semibold mb-1">Check your email</h2>
-        <p className="text-slate-500 text-sm">
+        <h2 className="text-foreground text-xl font-bold font-heading mb-1">Check your email</h2>
+        <p className="text-muted-foreground text-sm font-sans">
           We sent a 6-digit code to{" "}
-          <span className="font-medium text-slate-700">{email || "your email"}</span>.
+          <span className="font-bold text-primary dark:text-primary-foreground">{email || "your email"}</span>.
           <br />
           Enter it below to sign in.
         </p>
@@ -152,13 +144,13 @@ function VerifyForm() {
               onKeyDown={(e) => handleKeyDown(i, e)}
               onPaste={handlePaste}
               autoFocus={i === 0}
-              className={`w-11 h-13 text-center text-xl font-semibold border rounded-lg transition-all duration-200
-                text-slate-900 focus:outline-none focus:ring-2
+              className={`w-11 h-13 text-center text-xl font-bold border rounded-lg transition-all duration-200
+                text-foreground bg-background focus:outline-none focus:ring-2
                 ${error
-                  ? "border-red-400 focus:ring-red-500/20 focus:border-red-500"
-                  : "border-blue-200 focus:ring-blue-500/20 focus:border-blue-500"
+                  ? "border-red-500 focus:ring-red-500/20 focus:border-red-500"
+                  : "border-border focus:ring-primary/20 focus:border-primary"
                 }
-                ${digit ? "bg-blue-50" : "bg-white"}
+                ${digit ? "bg-primary/5 dark:bg-primary/10 border-primary" : ""}
               `}
             />
           ))}
@@ -166,18 +158,18 @@ function VerifyForm() {
 
         {/* Error message */}
         {error && (
-          <p className="text-center text-sm text-red-600 font-medium">{error}</p>
+          <p className="text-center text-sm text-red-500 font-bold">{error}</p>
         )}
 
         {/* Submit */}
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white py-2.5 px-6 rounded-lg font-semibold transition-all duration-300 shadow-lg shadow-blue-600/10 hover:shadow-blue-600/20 active:scale-[0.98] flex items-center justify-center gap-2"
+          className="w-full bg-primary hover:opacity-90 disabled:bg-primary/50 disabled:cursor-not-allowed text-primary-foreground py-2.5 px-6 rounded-lg font-bold transition-all duration-300 shadow-lg shadow-primary/20 active:scale-[0.98] flex items-center justify-center gap-2 font-heading"
         >
           {isLoading ? (
             <>
-              <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span className="inline-block w-4 h-4 border-2 border-secondary/30 border-t-secondary rounded-full animate-spin" />
               Verifying…
             </>
           ) : (
@@ -187,22 +179,22 @@ function VerifyForm() {
       </form>
 
       {/* Resend */}
-      <p className="mt-6 text-center text-sm text-slate-500">
+      <p className="mt-6 text-center text-sm text-muted-foreground font-sans">
         Didn&apos;t receive the code?{" "}
         <button
           type="button"
           onClick={handleResend}
-          className="text-blue-600 hover:text-blue-700 font-semibold transition-colors duration-200 underline-offset-2 hover:underline"
+          className="text-primary dark:text-secondary font-bold hover:opacity-80 transition-opacity underline-offset-4 hover:underline"
         >
           Resend
         </button>
       </p>
 
       {/* Back to login */}
-      <p className="mt-3 text-center text-sm text-slate-500">
+      <p className="mt-4 text-center text-sm text-muted-foreground">
         <a
           href="/login"
-          className="text-slate-400 hover:text-slate-600 transition-colors duration-200 underline-offset-2 hover:underline"
+          className="hover:text-foreground transition-colors underline-offset-4 hover:underline flex items-center justify-center gap-1"
         >
           ← Use a different email
         </a>
@@ -215,8 +207,8 @@ export default function Page() {
   return (
     <Suspense
       fallback={
-        <div className="bg-white rounded-2xl p-10 border border-slate-200 flex justify-center items-center min-h-[320px]">
-          <span className="inline-block w-6 h-6 border-2 border-slate-200 border-t-blue-500 rounded-full animate-spin" />
+        <div className="bg-background/80 rounded-2xl p-10 border border-border flex justify-center items-center min-h-[320px]">
+          <span className="inline-block w-6 h-6 border-2 border-border border-t-secondary rounded-full animate-spin" />
         </div>
       }
     >

@@ -20,23 +20,36 @@ export default function NavLink({ href, label, iconName }: NavLinkProps) {
   const pathname = usePathname();
   const isActive = pathname === href;
   
-  // Get the icon component from our lookup table
   const Icon = ICONS[iconName] || FileText; 
 
   return (
     <Link
       href={href}
-      className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group ${
+      className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 group border border-transparent ${
         isActive 
-          ? 'bg-blue-600 text-white shadow-md shadow-blue-600/10' 
-          : 'text-slate-500 hover:bg-blue-50 hover:text-slate-900'
+          ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' 
+          : 'text-muted-foreground hover:bg-primary/5 hover:text-foreground'
       }`}
     >
       <div className="flex items-center gap-3">
-        <Icon className={`w-4 h-4 ${isActive ? 'text-blue-300' : 'text-slate-400 group-hover:text-slate-900'}`} />
-        <span className="text-sm font-semibold tracking-tight">{label}</span>
+        <Icon 
+          className={`w-4 h-4 transition-colors duration-300 ${
+            isActive 
+              ? 'text-primary-foreground' 
+              : 'text-muted-foreground group-hover:text-primary'
+          }`} 
+        />
+        <span className={`text-sm font-bold tracking-tight font-heading ${
+          isActive ? 'text-primary-foreground' : ''
+        }`}>
+          {label}
+        </span>
       </div>
-      {isActive && <div className="w-1 h-1 rounded-full bg-blue-300" />}
+
+      {/* Decorative Brand indicator: Uses Financial Gold (secondary) for a badass contrast touch */}
+      {isActive && (
+        <div className="w-1.5 h-1.5 rounded-full bg-secondary shadow-[0_0_8px_rgba(255,222,17,0.6)] animate-pulse" />
+      )}
     </Link>
   );
 }
