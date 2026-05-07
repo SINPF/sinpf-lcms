@@ -7,7 +7,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:push": "npx drizzle-kit push"
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "^1.6.3",
