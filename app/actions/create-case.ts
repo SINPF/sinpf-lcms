@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { caseReferrals, caseReferralTypes, caseAttachments } from "@/db/schema";
-import { writeFile, mkdir } from "fs/promises";
+import { uploadFile } from "@/lib/minio";
 import path from "path";
 
 const TYPE_MAP: Record<string, "unpaid_contributions" | "unpaid_surcharges" | "wages_record"> = {
@@ -34,21 +34,19 @@ export async function createCase(formData: FormData) {
     );
   }
 
-  const files = formData.getAll("files") as File[];
+  const files = (formData.getAll("files") as File[]).filter((f) => f.size > 0);
   if (files.length > 0) {
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "cases", newCase.id);
-    await mkdir(uploadDir, { recursive: true });
-
     for (const file of files) {
       const safeName = file.name.replace(/[^a-z0-9._-]/gi, "_");
-      await writeFile(path.join(uploadDir, safeName), Buffer.from(await file.arrayBuffer()));
+      const objectKey = `cases/${newCase.id}/${safeName}`;
+      await uploadFile(objectKey, file);
 
       const ext = path.extname(file.name).slice(1).toLowerCase();
       await db.insert(caseAttachments).values({
         caseReferralId: newCase.id,
         fileName: file.name,
         fileType: ext === "pdf" ? "pdf" : ext === "csv" ? "csv" : "excel",
-        fileUrl: `/uploads/cases/${newCase.id}/${safeName}`,
+        fileUrl: objectKey,
       });
     }
   }
