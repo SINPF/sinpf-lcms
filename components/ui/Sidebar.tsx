@@ -34,9 +34,22 @@ export function Sidebar({ sections, logo, footer, className = "" }: SidebarProps
       }}
     >
       {/* Ambient top glow */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-[#1279BD]/20 via-[#089FFF]/5 to-transparent" />
-      {/* Subtle bottom vignette */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/30 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-[#1279BD]/25 via-[#089FFF]/8 to-transparent" />
+
+      {/* Brand yellow radial — mid-left */}
+      <div
+        className="pointer-events-none absolute -left-12 top-[38%] w-64 h-64 rounded-full"
+        style={{ background: "radial-gradient(circle, rgba(255,223,24,0.18) 0%, rgba(255,223,24,0.06) 45%, transparent 70%)" }}
+      />
+
+      {/* Sky blue radial — bottom-right */}
+      <div
+        className="pointer-events-none absolute -right-10 -bottom-6 w-56 h-56 rounded-full"
+        style={{ background: "radial-gradient(circle, rgba(8,159,255,0.22) 0%, rgba(8,159,255,0.08) 45%, transparent 70%)" }}
+      />
+
+      {/* Bottom sky gradient sweep */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[#089FFF]/[0.12] to-transparent" />
 
       {/* Logo slot */}
       {logo && (
