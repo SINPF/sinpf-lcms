@@ -3,7 +3,13 @@
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useRef, useState, KeyboardEvent, ClipboardEvent } from "react";
+import {
+  Suspense,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ClipboardEvent,
+} from "react";
 
 const OTP_LENGTH = 6;
 
@@ -18,27 +24,23 @@ function VerifyForm() {
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
   const otpRef = useRef<string[]>(Array(OTP_LENGTH).fill(""));
 
-  const focusInput = (index: number) => {
-    inputsRef.current[index]?.focus();
-  };
+  const focusInput = (i: number) => inputsRef.current[i]?.focus();
 
   const updateOtp = (next: string[]) => {
     otpRef.current = next;
     setOtp(next);
   };
 
-  const handleChange = (index: number, value: string) => {
+  const handleChange = (i: number, value: string) => {
     if (!/^\d?$/.test(value)) return;
     const next = [...otp];
-    next[index] = value;
+    next[i] = value;
     updateOtp(next);
-    if (value && index < OTP_LENGTH - 1) focusInput(index + 1);
+    if (value && i < OTP_LENGTH - 1) focusInput(i + 1);
   };
 
-  const handleKeyDown = (index: number, e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      focusInput(index - 1);
-    }
+  const handleKeyDown = (i: number, e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !otp[i] && i > 0) focusInput(i - 1);
   };
 
   const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
@@ -46,33 +48,22 @@ function VerifyForm() {
     const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, OTP_LENGTH);
     if (!pasted) return;
     const next = Array(OTP_LENGTH).fill("");
-    pasted.split("").forEach((char, i) => { next[i] = char; });
+    pasted.split("").forEach((c, i) => { next[i] = c; });
     updateOtp(next);
     focusInput(Math.min(pasted.length - 1, OTP_LENGTH - 1));
-    if (pasted.length === OTP_LENGTH) {
-      submitCode(next);
-    }
+    if (pasted.length === OTP_LENGTH) submitCode(next);
   };
 
   const submitCode = async (digits: string[]) => {
     const code = digits.join("");
-    if (code.length < OTP_LENGTH) {
-      setError("Please enter the full 6-digit code.");
-      return;
-    }
-
+    if (code.length < OTP_LENGTH) { setError("Please enter the full 6-digit code."); return; }
     setError("");
     setIsLoading(true);
     try {
-      const { error } = await authClient.signIn.emailOtp({
-        email,
-        otp: code,
-      });
-
+      const { error } = await authClient.signIn.emailOtp({ email, otp: code });
       if (error) {
         setError(error.message ?? "Verification failed. Please try again.");
-        const blank = Array(OTP_LENGTH).fill("");
-        updateOtp(blank);
+        updateOtp(Array(OTP_LENGTH).fill(""));
         focusInput(0);
       } else {
         router.push("/");
@@ -82,133 +73,116 @@ function VerifyForm() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await submitCode(otpRef.current);
-  };
-
   const handleResend = async () => {
     setError("");
-    const { error } = await authClient.emailOtp.sendVerificationOtp({
-      email,
-      type: "sign-in",
-    });
-    if (error) {
-      setError(error.message ?? "Could not resend code.");
-    } else {
-      setOtp(Array(OTP_LENGTH).fill(""));
-      focusInput(0);
-    }
+    const { error } = await authClient.emailOtp.sendVerificationOtp({ email, type: "sign-in" });
+    if (error) setError(error.message ?? "Could not resend code.");
+    else { updateOtp(Array(OTP_LENGTH).fill("")); focusInput(0); }
   };
 
   return (
-    <div className="bg-background/80 dark:bg-slate-900/60 rounded-2xl p-10 shadow-xl border border-border backdrop-blur-md">
-      {/* Logo */}
-      <div className="flex justify-center mb-6">
-        <div className="relative h-16 w-48">
-          <Image
-            src="/sinpf-logo.png"
-            alt="SINPF Logo"
-            fill
-            sizes="(max-width: 768px) 100vw, 200px"
-            className="object-contain dark:brightness-110"
-            priority
-          />
-        </div>
-      </div>
+    <div className="bg-white rounded-2xl shadow-2xl shadow-black/30 overflow-hidden">
+      {/* Yellow top bar */}
+      <div className="h-1.5 bg-brand-yellow" />
 
-      {/* Header */}
-      <div className="mb-8 text-center">
-        <h2 className="text-foreground text-xl font-bold font-heading mb-1">Check your email</h2>
-        <p className="text-muted-foreground text-sm font-sans">
-          We sent a 6-digit code to{" "}
-          <span className="font-bold text-primary dark:text-primary-foreground">{email || "your email"}</span>.
-          <br />
-          Enter it below to sign in.
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* OTP inputs */}
-        <div className="flex justify-center gap-2.5">
-          {otp.map((digit, i) => (
-            <input
-              key={i}
-              ref={(el) => { inputsRef.current[i] = el; }}
-              id={`otp-${i}`}
-              type="text"
-              inputMode="numeric"
-              maxLength={1}
-              value={digit}
-              onChange={(e) => handleChange(i, e.target.value)}
-              onKeyDown={(e) => handleKeyDown(i, e)}
-              onPaste={handlePaste}
-              autoFocus={i === 0}
-              className={`w-11 h-13 text-center text-xl font-bold border rounded-lg transition-all duration-200
-                text-foreground bg-background focus:outline-none focus:ring-2
-                ${error
-                  ? "border-red-500 focus:ring-red-500/20 focus:border-red-500"
-                  : "border-border focus:ring-primary/20 focus:border-primary"
-                }
-                ${digit ? "bg-primary/5 dark:bg-primary/10 border-primary" : ""}
-              `}
-            />
-          ))}
+      <div className="p-8">
+        {/* Logo */}
+        <div className="flex justify-center mb-6">
+          <div className="relative h-14 w-44">
+            <Image src="/sinpf-logo.png" alt="SINPF Logo" fill sizes="176px" className="object-contain" priority />
+          </div>
         </div>
 
-        {/* Error message */}
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h2 className="text-slate-900 text-lg font-bold mb-1">Check your email</h2>
+          <p className="text-slate-500 text-sm">
+            We sent a 6-digit code to{" "}
+            <span className="font-semibold text-brand-blue">{email || "your email"}</span>.
+          </p>
+        </div>
+
         {error && (
-          <p className="text-center text-sm text-red-500 font-bold">{error}</p>
+          <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700 font-medium">
+            {error}
+          </div>
         )}
 
-        {/* Submit */}
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-primary hover:opacity-90 disabled:bg-primary/50 disabled:cursor-not-allowed text-primary-foreground py-2.5 px-6 rounded-lg font-bold transition-all duration-300 shadow-lg shadow-primary/20 active:scale-[0.98] flex items-center justify-center gap-2 font-heading"
+        <form
+          onSubmit={(e) => { e.preventDefault(); submitCode(otpRef.current); }}
+          className="space-y-6"
         >
-          {isLoading ? (
-            <>
-              <span className="inline-block w-4 h-4 border-2 border-secondary/30 border-t-secondary rounded-full animate-spin" />
-              Verifying…
-            </>
-          ) : (
-            "Verify & Sign In"
-          )}
-        </button>
-      </form>
+          {/* OTP inputs */}
+          <div className="flex justify-center gap-2.5">
+            {otp.map((digit, i) => (
+              <input
+                key={i}
+                ref={(el) => { inputsRef.current[i] = el; }}
+                type="text"
+                inputMode="numeric"
+                maxLength={1}
+                value={digit}
+                onChange={(e) => handleChange(i, e.target.value)}
+                onKeyDown={(e) => handleKeyDown(i, e)}
+                onPaste={handlePaste}
+                autoFocus={i === 0}
+                className={[
+                  "w-11 h-12 text-center text-xl font-bold rounded-xl border transition-all",
+                  "text-slate-800 focus:outline-none focus:ring-2",
+                  error
+                    ? "border-red-300 bg-red-50 focus:ring-red-200"
+                    : digit
+                    ? "border-brand-blue bg-brand-blue/5 focus:ring-brand-blue/20 focus:border-brand-blue"
+                    : "border-slate-200 bg-slate-50 focus:ring-brand-blue/20 focus:border-brand-blue focus:bg-white",
+                ].join(" ")}
+              />
+            ))}
+          </div>
 
-      {/* Resend */}
-      <p className="mt-6 text-center text-sm text-muted-foreground font-sans">
-        Didn&apos;t receive the code?{" "}
-        <button
-          type="button"
-          onClick={handleResend}
-          className="text-primary dark:text-secondary font-bold hover:opacity-80 transition-opacity underline-offset-4 hover:underline"
-        >
-          Resend
-        </button>
-      </p>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full h-11 flex items-center justify-center gap-2 rounded-xl bg-brand-blue text-white text-sm font-semibold
+              shadow-lg shadow-brand-blue/25 hover:bg-brand-blue/90 active:scale-[0.99] disabled:opacity-60
+              disabled:cursor-not-allowed transition-all"
+          >
+            {isLoading ? (
+              <>
+                <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                Verifying…
+              </>
+            ) : (
+              "Verify & Sign In"
+            )}
+          </button>
+        </form>
 
-      {/* Back to login */}
-      <p className="mt-4 text-center text-sm text-muted-foreground">
-        <a
-          href="/login"
-          className="hover:text-foreground transition-colors underline-offset-4 hover:underline flex items-center justify-center gap-1"
-        >
-          ← Use a different email
-        </a>
-      </p>
+        <p className="mt-5 text-center text-sm text-slate-500">
+          Didn&apos;t receive the code?{" "}
+          <button
+            type="button"
+            onClick={handleResend}
+            className="text-brand-blue font-semibold hover:underline underline-offset-2 transition-all"
+          >
+            Resend
+          </button>
+        </p>
+        <p className="mt-3 text-center text-sm">
+          <a href="/login" className="text-slate-400 hover:text-slate-600 transition-colors">
+            ← Use a different email
+          </a>
+        </p>
+      </div>
     </div>
   );
 }
 
-export default function Page() {
+export default function VerifyPage() {
   return (
     <Suspense
       fallback={
-        <div className="bg-background/80 rounded-2xl p-10 border border-border flex justify-center items-center min-h-[320px]">
-          <span className="inline-block w-6 h-6 border-2 border-border border-t-secondary rounded-full animate-spin" />
+        <div className="bg-white rounded-2xl shadow-2xl shadow-black/30 p-10 flex justify-center items-center min-h-72">
+          <span className="w-6 h-6 border-2 border-slate-200 border-t-brand-blue rounded-full animate-spin" />
         </div>
       }
     >

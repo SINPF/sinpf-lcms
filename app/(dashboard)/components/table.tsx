@@ -1,75 +1,74 @@
-'use client'
-import { ChevronRight, PencilLine, Trash2 } from "lucide-react";
+"use client";
 
-function Table() {
-  return (
-    <div className="lg:col-span-2 bg-white border border-slate-200 overflow-hidden shadow-sm rounded-2xl">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead className="bg-slate-50 border-b border-slate-100">
-            <tr className="tracking-tight text-slate-700">
-              <th className="px-6 py-4 font-medium">Case Number</th>
-              <th className="px-6 py-4 font-medium">Parties</th>
-              <th className="px-6 py-4 font-medium">Status</th>
-              <th className="px-6 py-4 font-medium text-right">Actions</th>
-              <th className="px-6 py-4 w-10"></th>
-            </tr>
-          </thead>
-          <tbody className="text-sm divide-y divide-slate-50 font-body">
-            {[
-              { id: "LC-2026-001", name: "SINPF vs. Honiara Logistics", status: "Active" },
-              { id: "LC-2026-042", name: "Member Claim: J. Doe", status: "Active" },
-              { id: "LC-2025-899", name: "Compliance Audit: Area 4", status: "Active" },
-            ].map((row, i) => (
-              <tr key={i} className="group hover:bg-slate-50/50 transition-colors">
-                <td className="px-6 py-5 font-mono text-[11px] text-slate-400 tracking-tighter">
-                  {row.id}
-                </td>
-                <td className="px-6 py-5 text-slate-600 font-normal">
-                  {row.name}
-                </td>
-                <td className="px-6 py-5">
-                  <div className="flex items-center gap-2">
-                    <div className={`h-1.5 w-1.5 rounded-full ${
-                      row.status === 'Active' ? 'bg-blue-500' : 
-                      row.status === 'Review' ? 'bg-amber-500' : 'bg-slate-300'
-                    }`} />
-                    <span className="text-xs text-slate-500 font-normal">
-                      {row.status}
-                    </span>
-                  </div>
-                </td>
-                
-                {/* ACTIONS COLUMN */}
-                <td className="px-6 py-5 text-right">
-                  <div className="flex items-center justify-end gap-3">
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); console.log("Edit", row.id); }}
-                      className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                      title="Edit Record"
-                    >
-                      <PencilLine className="w-4 h-4" />
-                    </button>
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); console.log("Delete", row.id); }}
-                      className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                      title="Delete Record"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </td>
+import { DataTable } from "@/components/ui/DataTable";
+import { Badge, type BadgeStatus } from "@/components/ui/Badge";
+import type { Column } from "@/components/ui/DataTable";
+import {
+  IconPencil,
+  IconTrash,
+  IconChevronRight,
+} from "@tabler/icons-react";
 
-                <td className="px-4 py-5 text-right">
-                  <ChevronRight className="w-4 h-4 text-slate-200 group-hover:text-slate-400 transition-colors" />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+type CaseRow = Record<string, unknown> & {
+  id: string;
+  parties: string;
+  status: BadgeStatus;
+};
+
+const data: CaseRow[] = [
+  { id: "LC-2026-001", parties: "SINPF vs. Honiara Logistics", status: "active" },
+  { id: "LC-2026-042", parties: "Member Claim: J. Doe",        status: "filed" },
+  { id: "LC-2025-899", parties: "Compliance Audit: Area 4",    status: "pending" },
+];
+
+const columns: Column<CaseRow>[] = [
+  {
+    key: "id",
+    header: "Case Number",
+    render: (v) => (
+      <span className="font-mono text-[11px] text-muted-foreground tracking-tight">
+        {String(v)}
+      </span>
+    ),
+  },
+  {
+    key: "parties",
+    header: "Parties",
+    render: (v) => (
+      <span className="text-sm font-medium text-foreground">{String(v)}</span>
+    ),
+  },
+  {
+    key: "status",
+    header: "Status",
+    render: (v) => <Badge status={v as BadgeStatus} />,
+  },
+  {
+    key: "id",
+    header: "Actions",
+    align: "right",
+    render: (_, row) => (
+      <div className="flex items-center justify-end gap-1">
+        <button
+          onClick={() => console.log("Edit", row.id)}
+          className="p-1.5 text-muted-foreground hover:text-brand-blue hover:bg-brand-blue/5 rounded-lg transition-all"
+          title="Edit"
+        >
+          <IconPencil className="w-4 h-4" />
+        </button>
+        <button
+          onClick={() => console.log("Delete", row.id)}
+          className="p-1.5 text-muted-foreground hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+          title="Delete"
+        >
+          <IconTrash className="w-4 h-4" />
+        </button>
+        <IconChevronRight className="w-4 h-4 text-border ml-1" />
       </div>
-    </div>
-  );
-}
+    ),
+  },
+];
 
-export default Table;
+export default function Table() {
+  return <DataTable columns={columns} data={data} keyField="id" />;
+}
