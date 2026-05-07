@@ -1,24 +1,17 @@
 import type { Metadata } from "next";
-import { Public_Sans, Outfit, Space_Mono } from "next/font/google";
+import { DM_Sans, DM_Mono } from "next/font/google";
 import "./globals.css";
 
-// Heading Font: Bold, geometric, and very "Badass" for titles
-const outfit = Outfit({
-  variable: "--font-outfit",
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
-// Body Font: The gold standard for institutional/government UIs
-const publicSans = Public_Sans({
-  variable: "--font-public-sans",
+const dmMono = DM_Mono({
+  variable: "--font-dm-mono",
   subsets: ["latin"],
-});
-
-// Data/Code Font: High-contrast for legal case numbers
-const spaceMono = Space_Mono({
-  weight: ['400', '700'],
-  variable: "--font-space-mono",
-  subsets: ["latin"],
+  weight: ["300", "400", "500"],
 });
 
 export const metadata: Metadata = {
@@ -37,15 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`
-          ${outfit.variable} 
-          ${publicSans.variable} 
-          ${spaceMono.variable} 
-          antialiased 
-          bg-background 
-          text-foreground
-          font-sans
-        `}
+        className={`${dmSans.variable} ${dmMono.variable} antialiased bg-background text-foreground font-sans`}
       >
         {children}
       </body>

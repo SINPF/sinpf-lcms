@@ -1,89 +1,126 @@
 @import "tailwindcss";
 
-/* 1. Define the dark variant logic 
-*/
 @variant dark (&:where(.dark, .dark *));
 
+/* ─── Brand Raw Tokens ─────────────────────────────────────────────── */
 :root {
-  /* Brand Core */
-  --brand-blue: #0b75bb;
-  --brand-gold: #ffde11;
-  --brand-navy: #24365e;
+  --yellow: #FFDF18;
+  --blue:   #1279BD;
+  --sky:    #089FFF;
+  --ink:    #0B1120;
 
-  /* Functional Semantic Tokens - LIGHT MODE (Default) */
-  --background: #f8fafc;
-  --foreground: #1e293b;
-  
-  --primary: var(--brand-blue);
-  --primary-foreground: #ffffff;
-  
-  --secondary: var(--brand-gold);
-  --secondary-foreground: #24365e;
-  
-  --accent: var(--brand-navy);
+  /* Radius scale */
+  --radius-sm:  0.375rem;   /* 6px  */
+  --radius-md:  0.625rem;   /* 10px */
+  --radius-lg:  0.875rem;   /* 14px */
+  --radius-xl:  1.125rem;   /* 18px */
+  --radius-2xl: 1.5rem;     /* 24px */
+  --radius-3xl: 2rem;       /* 32px */
+
+  /* Border */
+  --border-width: 1px;
+  --border-width-2: 2px;
+
+  /* Semantic tokens – Light Mode */
+  --background:        #f8fafc;
+  --foreground:        #1e293b;
+
+  --primary:           var(--blue);
+  --primary-foreground:#ffffff;
+
+  --secondary:         var(--yellow);
+  --secondary-foreground: var(--ink);
+
+  --accent:            var(--ink);
   --accent-foreground: #ffffff;
 
-  --muted: #e2e8f0;
-  --muted-foreground: #64748b;
-  
-  --border: #cbd5e1;
+  --muted:             #e2e8f0;
+  --muted-foreground:  #64748b;
+
+  --border:            #cbd5e1;
+  --ring:              var(--blue);
+
+  /* Status colors */
+  --status-filed:   #1279BD;
+  --status-active:  #059669;
+  --status-pending: #d97706;
+  --status-hearing: #ea580c;
+  --status-closed:  #64748b;
+  --status-appeal:  #7c3aed;
+
+  /* Priority colors */
+  --priority-critical: #dc2626;
+  --priority-high:     #ea580c;
+  --priority-medium:   #d97706;
+  --priority-low:      #6b7280;
 }
 
-/* 2. The Critical Fix: 
-  Instead of JUST @media, we use the .dark class. 
-  This allows your ThemeToggle to actually swap these variables.
-*/
 .dark {
-  --background: #0f172a;
-  --foreground: #f1f5f9;
-  
-  --primary: #38bdf8; /* Brightened for dark mode legibility */
-  --primary-foreground: #ffffff;
-  
-  --secondary: var(--brand-gold);
-  --secondary-foreground: #1e293b;
-  
-  --accent: #1e293b;
+  --background:        #0a0f1e;
+  --foreground:        #f1f5f9;
+
+  --primary:           var(--sky);
+  --primary-foreground:#ffffff;
+
+  --secondary:         var(--yellow);
+  --secondary-foreground: var(--ink);
+
+  --accent:            #1a2035;
   --accent-foreground: #f1f5f9;
 
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  
-  --border: #334155;
+  --muted:             #1e293b;
+  --muted-foreground:  #94a3b8;
+
+  --border:            #1e2d42;
+  --ring:              var(--sky);
 }
 
-/* 3. Map CSS Variables to Tailwind Theme Tokens
-*/
+/* ─── Tailwind v4 Theme Mapping ────────────────────────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  
-  --color-secondary: var(--secondary);
+  /* Semantic color utilities */
+  --color-background:           var(--background);
+  --color-foreground:           var(--foreground);
+  --color-primary:              var(--primary);
+  --color-primary-foreground:   var(--primary-foreground);
+  --color-secondary:            var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-  
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
+  --color-accent:               var(--accent);
+  --color-accent-foreground:    var(--accent-foreground);
+  --color-muted:                var(--muted);
+  --color-muted-foreground:     var(--muted-foreground);
+  --color-border:               var(--border);
+  --color-ring:                 var(--ring);
 
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  
-  --color-border: var(--border);
+  /* Brand palette utilities */
+  --color-brand-yellow: var(--yellow);
+  --color-brand-blue:   var(--blue);
+  --color-brand-sky:    var(--sky);
+  --color-brand-ink:    var(--ink);
 
-  /* Mapping fonts to the Next.js variables from your Layout */
-  --font-sans: var(--font-public-sans), 'Inter', sans-serif;
-  --font-heading: var(--font-outfit), sans-serif;
-  --font-mono: var(--font-space-mono), monospace;
+  /* Sidebar */
+  --color-sidebar:          var(--ink);
+  --color-sidebar-foreground: #e2e8f0;
+  --color-sidebar-muted:    #334155;
+  --color-sidebar-active:   var(--yellow);
+
+  /* Radius utilities */
+  --radius-sm:  var(--radius-sm);
+  --radius-md:  var(--radius-md);
+  --radius-lg:  var(--radius-lg);
+  --radius-xl:  var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+  --radius-3xl: var(--radius-3xl);
+
+  /* Font stacks */
+  --font-sans:    var(--font-dm-sans), 'DM Sans', system-ui, sans-serif;
+  --font-mono:    var(--font-dm-mono), 'DM Mono', 'Fira Code', monospace;
+  --font-heading: var(--font-dm-sans), 'DM Sans', system-ui, sans-serif;
 }
 
-/* 4. Global Styles 
-*/
+/* ─── Global Base ──────────────────────────────────────────────────── */
 @layer base {
   * {
     box-sizing: border-box;
-    /* Use the variable directly for native elements */
     border-color: var(--border);
   }
 
@@ -92,22 +129,27 @@
     color: var(--foreground);
     font-family: var(--font-sans);
     line-height: 1.6;
-    /* Smooth transition for theme switching */
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
   }
 
   h1, h2, h3, h4 {
-    /* Auto-updates color based on current --brand-navy/--primary value */
-    color: var(--brand-navy);
+    font-family: var(--font-heading);
     font-weight: 700;
+    color: var(--ink);
   }
 
-  /* Specific Heading override for Dark Mode */
   .dark h1, .dark h2, .dark h3, .dark h4 {
-    color: var(--primary);
+    color: var(--foreground);
   }
 
   button, input, select, textarea {
     font-family: inherit;
   }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted-foreground); }
 }
