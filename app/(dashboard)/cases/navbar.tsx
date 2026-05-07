@@ -1,14 +1,19 @@
 import { Plus, Search } from "lucide-react";
 import Link from "next/link";
+import { db } from "@/db";
+import { caseReferrals } from "@/db/schema";
+import { count } from "drizzle-orm";
 
-export default function NavBar() {
+export default async function NavBar() {
+  const [{ total }] = await db.select({ total: count() }).from(caseReferrals);
+
   return (
     <div className="mb-8">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-bold text-foreground">Case Records</h2>
           <span className="px-2.5 py-0.5 rounded-full bg-brand-blue/10 text-brand-blue text-xs font-bold">
-            3
+            {total}
           </span>
         </div>
 
