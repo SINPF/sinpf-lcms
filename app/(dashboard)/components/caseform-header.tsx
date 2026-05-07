@@ -7,11 +7,9 @@ interface HeaderProps {
 }
 
 function Header({ onClose, onToggleExpand, isMaximized }: HeaderProps) {
-  // Use theme-aware classes for icons and buttons
   const iconClasses = "w-4 h-4 transition-transform duration-200 active:scale-90";
-  
-  // buttonClasses now use semantic muted background and foreground tokens
-  const buttonClasses = "p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-all flex items-center justify-center border border-transparent hover:border-border";
+  const buttonClasses =
+    "p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-all flex items-center justify-center border border-transparent hover:border-border";
 
   return (
     <header className="px-8 py-5 border-b border-border flex justify-between items-center bg-background transition-colors duration-300">
@@ -20,7 +18,6 @@ function Header({ onClose, onToggleExpand, isMaximized }: HeaderProps) {
           Create New Case
         </h2>
         <div className="flex items-center gap-2">
-          {/* Brand Indicator Dot */}
           <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
           <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-70">
             Legal Filing Portal
@@ -29,7 +26,6 @@ function Header({ onClose, onToggleExpand, isMaximized }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        {/* Expand / Minimize Toggle - Uses Brand Gold on hover for a premium touch */}
         <button
           onClick={onToggleExpand}
           className={`${buttonClasses} hover:bg-secondary/10 hover:text-secondary-foreground hover:border-secondary/20`}
@@ -42,7 +38,6 @@ function Header({ onClose, onToggleExpand, isMaximized }: HeaderProps) {
           )}
         </button>
 
-        {/* Close Button - Uses a clean muted red for the destructive action */}
         <button
           onClick={onClose}
           className={`${buttonClasses} hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20`}

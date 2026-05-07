@@ -3,22 +3,12 @@ import CaseForm from "./caseform";
 export default function CaseFormModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* 
-         1. BACKDROP: 
-         Uses a blur and a theme-aware overlay. 
-         Replaces slate-900 with a mix of the accent (Navy) color for better brand alignment.
-      */}
-      <div 
-        className="absolute inset-0 bg-accent/40 dark:bg-black/60 backdrop-blur-sm transition-opacity duration-300" 
-        onClick={onClose} 
+      <div
+        className="absolute inset-0 bg-accent/40 dark:bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+        onClick={onClose}
       />
-
-      {/* 
-         2. MODAL CONTENT:
-         Added an animation wrapper to make the entry feel smoother and more "badass."
-      */}
       <div className="relative z-10 w-full max-w-6xl h-[90vh] flex items-center justify-center animate-in fade-in zoom-in-95 duration-300">
-        <CaseForm onClose={onClose}/>
+        <CaseForm onClose={onClose} />
       </div>
     </div>
   );
