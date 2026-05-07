@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, index } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, index, pgEnum, numeric, date } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -91,3 +92,60 @@ export const accountRelations = relations(account, ({ one }) => ({
     references: [user.id],
   }),
 }));
+
+
+// Enums
+export const caseTypeEnum = pgEnum("case_type", [
+  "unpaid_contributions",
+  "unpaid_surcharges",
+  "wages_record",
+]);
+
+export const caseStatusEnum = pgEnum("case_status", [
+  "referred",
+  "in_progress",
+  "resolved",
+  "closed",
+]);
+
+// Main case referral table
+export const caseReferrals = pgTable("case_referrals", {
+  id:                 text("id").primaryKey().default(sql`gen_random_uuid()`),
+
+  // Section 1: Employer Info
+  employerName:       text("employer_name").notNull(),
+  employerCode:       text("employer_code").notNull(),
+  referralDate:       date("referral_date").notNull().default(sql`CURRENT_DATE`),
+
+  // Section 2: Financials
+  totalContributions: numeric("total_contributions", { precision: 15, scale: 2 }).notNull().default("0"),
+  totalSurcharges:    numeric("total_surcharges",    { precision: 15, scale: 2 }).notNull().default("0"),
+  wagesRecord:        numeric("wages_record",        { precision: 15, scale: 2 }).notNull().default("0"),
+  grandTotalClaim:    numeric("grand_total_claim",   { precision: 15, scale: 2 }).notNull().default("0"),
+  // grandTotalClaim = totalContributions + totalSurcharges + wagesRecord
+  // Computed on the application layer before insert/update
+
+  // Section 3: Status
+  status:             caseStatusEnum("status").notNull().default("referred"),
+
+  // Timestamps
+  createdAt:          timestamp("created_at").notNull().default(sql`now()`),
+  updatedAt:          timestamp("updated_at").notNull().default(sql`now()`),
+});
+
+// Case types (many-to-many — one case can have multiple types)
+export const caseReferralTypes = pgTable("case_referral_types", {
+  id:             text("id").primaryKey().default(sql`gen_random_uuid()`),
+  caseReferralId: text("case_referral_id").notNull().references(() => caseReferrals.id, { onDelete: "cascade" }),
+  caseType:       caseTypeEnum("case_type").notNull(),
+});
+
+// Attachments
+export const caseAttachments = pgTable("case_attachments", {
+  id:             text("id").primaryKey().default(sql`gen_random_uuid()`),
+  caseReferralId: text("case_referral_id").notNull().references(() => caseReferrals.id, { onDelete: "cascade" }),
+  fileName:       text("file_name").notNull(),
+  fileType:       text("file_type").notNull(),   // "pdf" | "excel" | "csv"
+  fileUrl:        text("file_url").notNull(),     // path or storage URL
+  uploadedAt:     timestamp("uploaded_at").notNull().default(sql`now()`),
+});
