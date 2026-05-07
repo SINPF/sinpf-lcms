@@ -9,7 +9,7 @@ function BrandArea() {
               alt="SINPF Logo"
               width={40}
               height={40}
-              className="rounded-xl shadow-lg shadow-primary/20 dark:shadow-primary/5 transition-shadow"
+              className="rounded-xl shadow-lg shadow-primary/20 transition-shadow"
             />
           </div>
           <div className="flex flex-col">
