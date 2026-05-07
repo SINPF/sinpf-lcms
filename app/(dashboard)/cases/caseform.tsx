@@ -105,6 +105,7 @@ export default function CaseForm({ onClose }: { onClose: () => void }) {
       data.selectedTypes.forEach((t) => formData.append("selectedTypes", t));
       files.forEach((f) => formData.append("files", f));
       await createCase(formData);
+      onClose();
     } catch {
       setError("Failed to save case. Please try again.");
     }
