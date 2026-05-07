@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Public_Sans, Outfit, Space_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
 
 // Heading Font: Bold, geometric, and very "Badass" for titles
 const outfit = Outfit({
@@ -48,9 +47,7 @@ export default function RootLayout({
           font-sans
         `}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
-        </ThemeProvider>
+        {children}
       </body>
     </html>
   );
