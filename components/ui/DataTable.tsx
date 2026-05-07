@@ -36,9 +36,9 @@ export function DataTable<T extends Record<string, unknown>>({
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-muted/40 border-b border-border">
-            {columns.map((col) => (
+            {columns.map((col, i) => (
               <th
-                key={String(col.key)}
+                key={`${i}-${String(col.key)}`}
                 style={col.width ? { width: col.width } : undefined}
                 className={`px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-muted-foreground ${
                   alignClass[col.align ?? "left"]
@@ -53,8 +53,8 @@ export function DataTable<T extends Record<string, unknown>>({
           {loading ? (
             Array.from({ length: 4 }).map((_, i) => (
               <tr key={i} className="border-b border-border last:border-0">
-                {columns.map((col) => (
-                  <td key={String(col.key)} className="px-4 py-3">
+                {columns.map((col, i) => (
+                  <td key={`${i}-${String(col.key)}`} className="px-4 py-3">
                     <div className="h-4 bg-muted/60 rounded animate-pulse" />
                   </td>
                 ))}
@@ -75,9 +75,9 @@ export function DataTable<T extends Record<string, unknown>>({
                 key={String(row[keyField])}
                 className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors"
               >
-                {columns.map((col) => (
+                {columns.map((col, i) => (
                   <td
-                    key={String(col.key)}
+                    key={`${i}-${String(col.key)}`}
                     className={`px-4 py-3 text-foreground ${alignClass[col.align ?? "left"]}`}
                   >
                     {col.render
