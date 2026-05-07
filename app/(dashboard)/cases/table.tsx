@@ -4,34 +4,49 @@ import { DataTable } from "@/components/ui/DataTable";
 import { Badge, type BadgeStatus } from "@/components/ui/Badge";
 import type { Column } from "@/components/ui/DataTable";
 import { IconPencil, IconTrash, IconChevronRight } from "@tabler/icons-react";
+import type { Case } from "@/db/types";
 
-type CaseRow = Record<string, unknown> & {
-  id: string;
-  parties: string;
-  status: BadgeStatus;
-};
-
-const data: CaseRow[] = [
-  { id: "LC-2026-001", parties: "SINPF vs. Honiara Logistics", status: "active" },
-  { id: "LC-2026-042", parties: "Member Claim: J. Doe",        status: "filed" },
-  { id: "LC-2025-899", parties: "Compliance Audit: Area 4",    status: "pending" },
-];
+type CaseRow = Case & Record<string, unknown>;
 
 const columns: Column<CaseRow>[] = [
   {
     key: "id",
-    header: "Case Number",
+    header: "Case ID",
     render: (v) => (
       <span className="font-mono text-[11px] text-muted-foreground tracking-tight">
-        {String(v)}
+        {String(v).slice(0, 8).toUpperCase()}
       </span>
     ),
   },
   {
-    key: "parties",
-    header: "Parties",
+    key: "employerName",
+    header: "Employer",
     render: (v) => (
       <span className="text-sm font-medium text-foreground">{String(v)}</span>
+    ),
+  },
+  {
+    key: "employerCode",
+    header: "Code",
+    render: (v) => (
+      <span className="font-mono text-[11px] text-muted-foreground">{String(v)}</span>
+    ),
+  },
+  {
+    key: "referralDate",
+    header: "Referral Date",
+    render: (v) => (
+      <span className="text-sm text-muted-foreground">{String(v)}</span>
+    ),
+  },
+  {
+    key: "grandTotalClaim",
+    header: "Total Claim",
+    align: "right",
+    render: (v) => (
+      <span className="text-sm font-semibold text-foreground tabular-nums">
+        {Number(v).toLocaleString("en-SB", { style: "currency", currency: "SBD" })}
+      </span>
     ),
   },
   {
@@ -65,6 +80,13 @@ const columns: Column<CaseRow>[] = [
   },
 ];
 
-export default function Table() {
-  return <DataTable columns={columns} data={data} keyField="id" />;
+export default function Table({ cases }: { cases: Case[] }) {
+  return (
+    <DataTable
+      columns={columns}
+      data={cases as CaseRow[]}
+      keyField="id"
+      emptyMessage="No cases found."
+    />
+  );
 }
