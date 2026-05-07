@@ -1,11 +1,7 @@
 import { Plus, Search } from "lucide-react";
 import Link from "next/link";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
 
-export default async function NavBar() {
-  const session = await auth.api.getSession({ headers: await headers() });
-
+export default function NavBar() {
   return (
     <div className="mb-8">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -17,11 +13,6 @@ export default async function NavBar() {
         </div>
 
         <div className="flex items-center gap-3">
-          {session?.user.email && (
-            <span className="text-xs font-medium text-muted-foreground">
-              {session.user.email}
-            </span>
-          )}
           <div className="relative group">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-brand-blue transition-colors" />
             <input
