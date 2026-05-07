@@ -5,6 +5,7 @@ import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X, Maximize2, Minimize2 } from "lucide-react";
 import { insertCaseSchema, CaseFormValues } from "@/db/validator";
+import { createCase } from "@/app/actions/create-case";
 import General from "./caseform-general";
 import FinancialDetails from "./caseform-financial-details";
 
@@ -59,12 +60,14 @@ export default function CaseForm({ onClose }: { onClose: () => void }) {
   const [isMaximized, setIsMaximized] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
 
+  const [error, setError] = useState<string | null>(null);
+
   const {
     register,
     control,
     handleSubmit,
     watch,
-    formState: { isSubmitSuccessful },
+    formState: { isSubmitSuccessful, isSubmitting },
   } = useForm<CaseFormValues>({
     resolver: zodResolver(insertCaseSchema) as Resolver<CaseFormValues>,
     defaultValues: {
@@ -87,10 +90,24 @@ export default function CaseForm({ onClose }: { onClose: () => void }) {
   const isWagesRecordSelected = selectedTypes.includes("Wages record");
   const canSave = !isWagesRecordSelected || files.length > 0;
 
-  const onSubmit = (data: CaseFormValues) => {
+  const onSubmit = async (data: CaseFormValues) => {
     if (!canSave) return;
-    const { selectedTypes: _, ...fields } = data;
-    console.log("Submit:", { ...fields, grandTotalClaim: grandTotal });
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append("employerName", data.employerName);
+      formData.append("employerCode", data.employerCode);
+      formData.append("referralDate", data.referralDate ?? "");
+      formData.append("totalContributions", String(data.totalContributions));
+      formData.append("totalSurcharges", String(data.totalSurcharges));
+      formData.append("wagesRecord", String(data.wagesRecord));
+      formData.append("grandTotalClaim", String(grandTotal));
+      data.selectedTypes.forEach((t) => formData.append("selectedTypes", t));
+      files.forEach((f) => formData.append("files", f));
+      await createCase(formData);
+    } catch {
+      setError("Failed to save case. Please try again.");
+    }
   };
 
   return (
@@ -133,6 +150,12 @@ export default function CaseForm({ onClose }: { onClose: () => void }) {
           </div>
         )}
 
+        {error && (
+          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-500 font-medium">
+            {error}
+          </div>
+        )}
+
         <div className="flex justify-between items-center gap-4 pt-4">
           <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
             Status:{" "}
@@ -140,14 +163,14 @@ export default function CaseForm({ onClose }: { onClose: () => void }) {
           </span>
           <button
             type="submit"
-            disabled={!canSave}
+            disabled={!canSave || isSubmitting}
             className={`px-10 py-4 rounded-xl font-bold transition-all shadow-lg font-heading active:scale-95 ${
-              canSave
+              canSave && !isSubmitting
                 ? "bg-primary text-primary-foreground hover:opacity-90 shadow-primary/20"
                 : "bg-muted text-muted-foreground cursor-not-allowed"
             }`}
           >
-            Save Record
+            {isSubmitting ? "Saving…" : "Save Record"}
           </button>
         </div>
       </form>
