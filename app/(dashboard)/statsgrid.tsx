@@ -13,10 +13,7 @@ import {
 
 type Color = "blue" | "sky" | "yellow" | "emerald" | "violet" | "orange";
 
-const colorConfig: Record<
-  Color,
-  { bar: string; iconBg: string; iconText: string }
-> = {
+const colorConfig: Record<Color, { bar: string; iconBg: string; iconText: string }> = {
   blue:    { bar: "bg-brand-blue",   iconBg: "bg-brand-blue/10",   iconText: "text-brand-blue"   },
   sky:     { bar: "bg-brand-sky",    iconBg: "bg-brand-sky/10",    iconText: "text-brand-sky"    },
   yellow:  { bar: "bg-brand-yellow", iconBg: "bg-amber-50",        iconText: "text-amber-600"    },
@@ -41,15 +38,12 @@ function DashboardStatCard({ label, value, description, icon, delta, color }: St
 
   return (
     <div className="bg-background border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-border/60 transition-all duration-200 group cursor-default">
-      {/* Colored top accent */}
       <div className={`h-1 ${cfg.bar}`} />
-
       <div className="p-5">
         <div className="flex items-start justify-between mb-5">
           <div className={`p-2.5 ${cfg.iconBg} rounded-xl`}>
             <span className={cfg.iconText}>{icon}</span>
           </div>
-
           {delta !== undefined && (
             <span
               className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full ${
@@ -72,7 +66,6 @@ function DashboardStatCard({ label, value, description, icon, delta, color }: St
             </span>
           )}
         </div>
-
         <p className="text-3xl font-bold text-foreground tracking-tight font-mono leading-none">
           {value}
         </p>
@@ -88,54 +81,12 @@ function DashboardStatCard({ label, value, description, icon, delta, color }: St
 }
 
 const stats: StatCardProps[] = [
-  {
-    label: "Contributions",
-    value: "10",
-    description: "active cases",
-    icon: <IconReceiptTax className="w-5 h-5" />,
-    delta: 5,
-    color: "blue",
-  },
-  {
-    label: "Surcharges",
-    value: "45",
-    description: "active cases",
-    icon: <IconCoin className="w-5 h-5" />,
-    delta: 12,
-    color: "sky",
-  },
-  {
-    label: "Wages Record",
-    value: "10",
-    description: "active cases",
-    icon: <IconCash className="w-5 h-5" />,
-    delta: -2,
-    color: "yellow",
-  },
-  {
-    label: "Trade Dispute",
-    value: "12",
-    description: "active cases",
-    icon: <IconScale className="w-5 h-5" />,
-    delta: 0,
-    color: "emerald",
-  },
-  {
-    label: "Land & Titles",
-    value: "2",
-    description: "active cases",
-    icon: <IconHome className="w-5 h-5" />,
-    delta: -1,
-    color: "violet",
-  },
-  {
-    label: "Rental Defaulters",
-    value: "2",
-    description: "active cases",
-    icon: <IconBuildingStore className="w-5 h-5" />,
-    delta: 1,
-    color: "orange",
-  },
+  { label: "Contributions",    value: "10", description: "active cases", icon: <IconReceiptTax className="w-5 h-5" />, delta: 5,   color: "blue"    },
+  { label: "Surcharges",       value: "45", description: "active cases", icon: <IconCoin className="w-5 h-5" />,        delta: 12,  color: "sky"     },
+  { label: "Wages Record",     value: "10", description: "active cases", icon: <IconCash className="w-5 h-5" />,        delta: -2,  color: "yellow"  },
+  { label: "Trade Dispute",    value: "12", description: "active cases", icon: <IconScale className="w-5 h-5" />,       delta: 0,   color: "emerald" },
+  { label: "Land & Titles",    value: "2",  description: "active cases", icon: <IconHome className="w-5 h-5" />,        delta: -1,  color: "violet"  },
+  { label: "Rental Defaulters",value: "2",  description: "active cases", icon: <IconBuildingStore className="w-5 h-5" />, delta: 1, color: "orange"  },
 ];
 
 export default function StatsGrid() {

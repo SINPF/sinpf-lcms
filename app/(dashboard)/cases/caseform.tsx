@@ -1,13 +1,61 @@
 "use client";
+
 import { useState } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { X, Maximize2, Minimize2 } from "lucide-react";
 import { insertCaseSchema, CaseFormValues } from "@/db/validator";
-import General from "./caseform-tabs/general";
-import FinancialDetails from "./caseform-tabs/financial-details";
-import Header from "./caseform-header";
+import General from "./caseform-general";
+import FinancialDetails from "./caseform-financial-details";
 
-function CaseForm({ onClose }: { onClose: () => void }) {
+const iconClasses = "w-4 h-4 transition-transform duration-200 active:scale-90";
+const btnClasses =
+  "p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-all flex items-center justify-center border border-transparent hover:border-border";
+
+function CaseFormHeader({
+  onClose,
+  onToggleExpand,
+  isMaximized,
+}: {
+  onClose: () => void;
+  onToggleExpand: () => void;
+  isMaximized: boolean;
+}) {
+  return (
+    <header className="px-8 py-5 border-b border-border flex justify-between items-center bg-background transition-colors duration-300">
+      <div>
+        <h2 className="text-lg font-bold text-foreground tracking-tight font-heading">
+          Create New Case
+        </h2>
+        <div className="flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+          <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-70">
+            Legal Filing Portal
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <button
+          onClick={onToggleExpand}
+          className={`${btnClasses} hover:bg-secondary/10 hover:text-secondary-foreground hover:border-secondary/20`}
+          title={isMaximized ? "Restore" : "Maximize"}
+        >
+          {isMaximized ? <Minimize2 className={iconClasses} /> : <Maximize2 className={iconClasses} />}
+        </button>
+        <button
+          onClick={onClose}
+          className={`${btnClasses} hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20`}
+          title="Close"
+        >
+          <X className={iconClasses} />
+        </button>
+      </div>
+    </header>
+  );
+}
+
+export default function CaseForm({ onClose }: { onClose: () => void }) {
   const [isMaximized, setIsMaximized] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
 
@@ -51,7 +99,7 @@ function CaseForm({ onClose }: { onClose: () => void }) {
         isMaximized ? "w-full h-full rounded-none" : "w-5/6 h-5/6"
       }`}
     >
-      <Header
+      <CaseFormHeader
         onClose={onClose}
         onToggleExpand={() => setIsMaximized(!isMaximized)}
         isMaximized={isMaximized}
@@ -87,7 +135,8 @@ function CaseForm({ onClose }: { onClose: () => void }) {
 
         <div className="flex justify-between items-center gap-4 pt-4">
           <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
-            Status: <span className="text-primary">{isSubmitSuccessful ? "Referred" : "Draft"}</span>
+            Status:{" "}
+            <span className="text-primary">{isSubmitSuccessful ? "Referred" : "Draft"}</span>
           </span>
           <button
             type="submit"
@@ -105,5 +154,3 @@ function CaseForm({ onClose }: { onClose: () => void }) {
     </div>
   );
 }
-
-export default CaseForm;

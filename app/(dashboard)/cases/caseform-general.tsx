@@ -1,5 +1,5 @@
 import { Check } from "lucide-react";
-import { Controller, Control, UseFormRegister } from "react-hook-form";
+import { Controller, type Control, type UseFormRegister } from "react-hook-form";
 import { CaseFormValues } from "@/db/validator";
 
 const CASE_TYPES = ["Unpaid contributions", "Unpaid surcharges", "Wages record"] as const;
@@ -9,7 +9,7 @@ const inputClasses =
 const labelClasses =
   "block text-[11px] font-black text-muted-foreground uppercase tracking-widest mb-2 ml-1";
 
-function General({
+export default function General({
   register,
   control,
 }: {
@@ -97,5 +97,3 @@ function General({
     </div>
   );
 }
-
-export default General;

@@ -1,5 +1,5 @@
-import NavBar from "../components/navbar";
-import Table from "../components/table";
+import NavBar from "./navbar";
+import Table from "./table";
 
 export default function CasesPage() {
   return (

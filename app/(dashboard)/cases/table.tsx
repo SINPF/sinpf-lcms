@@ -3,11 +3,7 @@
 import { DataTable } from "@/components/ui/DataTable";
 import { Badge, type BadgeStatus } from "@/components/ui/Badge";
 import type { Column } from "@/components/ui/DataTable";
-import {
-  IconPencil,
-  IconTrash,
-  IconChevronRight,
-} from "@tabler/icons-react";
+import { IconPencil, IconTrash, IconChevronRight } from "@tabler/icons-react";
 
 type CaseRow = Record<string, unknown> & {
   id: string;

@@ -1,6 +1,6 @@
 "use client";
 import Modal from "@/components/ui/Modal";
-import CaseForm from "@/app/(dashboard)/components/caseform";
+import CaseForm from "@/app/(dashboard)/cases/caseform";
 import { useRouter } from "next/navigation";
 
 export default function InterceptedModal() {

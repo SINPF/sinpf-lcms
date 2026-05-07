@@ -5,7 +5,6 @@ export default function NavBar() {
   return (
     <div className="mb-8">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        {/* Left: count */}
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-bold text-foreground">Case Records</h2>
           <span className="px-2.5 py-0.5 rounded-full bg-brand-blue/10 text-brand-blue text-xs font-bold">
@@ -13,7 +12,6 @@ export default function NavBar() {
           </span>
         </div>
 
-        {/* Right: search + action */}
         <div className="flex items-center gap-3">
           <div className="relative group">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-brand-blue transition-colors" />

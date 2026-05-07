@@ -1,13 +1,13 @@
-import { UseFormRegister } from "react-hook-form";
+import { type UseFormRegister } from "react-hook-form";
 import { CaseFormValues } from "@/db/validator";
-import UploadFiles from "./upload-files";
+import UploadFiles from "./caseform-upload-files";
 
 const inputClasses =
   "w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground/30";
 const labelClasses =
   "block text-[11px] font-black text-muted-foreground uppercase tracking-widest mb-2 ml-1";
 
-function FinancialDetails({
+export default function FinancialDetails({
   register,
   grandTotal,
   isWagesRecordSelected,
@@ -101,5 +101,3 @@ function FinancialDetails({
     </div>
   );
 }
-
-export default FinancialDetails;

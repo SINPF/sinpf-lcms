@@ -1,7 +1,7 @@
 "use client";
 import Table from "../page";
 import Modal from "@/components/ui/Modal";
-import CaseForm from "../../components/caseform";
+import CaseForm from "../caseform";
 import { useRouter } from "next/navigation";
 
 export default function ManualCreatePage() {
