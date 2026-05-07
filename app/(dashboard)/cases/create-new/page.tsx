@@ -1,7 +1,7 @@
 "use client";
-import Table from "../page"; // Import your main table component
-
-import CaseFormModal from "../../components/caseform-modal";
+import Table from "../page";
+import Modal from "@/components/ui/Modal";
+import CaseForm from "../../components/caseform";
 import { useRouter } from "next/navigation";
 
 export default function ManualCreatePage() {
@@ -9,11 +9,10 @@ export default function ManualCreatePage() {
 
   return (
     <>
-      {/* 1. Show the table so the background isn't blank */}
       <Table />
-
-      {/* 2. Show the modal on top */}
-      <CaseFormModal onClose={() => router.push("/cases")} />
+      <Modal onClose={() => router.push("/cases")}>
+        <CaseForm onClose={() => router.push("/cases")} />
+      </Modal>
     </>
   );
 }

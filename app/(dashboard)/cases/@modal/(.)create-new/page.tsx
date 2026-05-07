@@ -1,9 +1,13 @@
 "use client";
-import CaseFormModal from "@/app/(dashboard)/components/caseform-modal";
-
+import Modal from "@/components/ui/Modal";
+import CaseForm from "@/app/(dashboard)/components/caseform";
 import { useRouter } from "next/navigation";
 
 export default function InterceptedModal() {
   const router = useRouter();
-  return <CaseFormModal onClose={() => router.back()} />;
+  return (
+    <Modal onClose={() => router.back()}>
+      <CaseForm onClose={() => router.back()} />
+    </Modal>
+  );
 }
