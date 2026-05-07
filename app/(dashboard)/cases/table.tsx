@@ -4,9 +4,9 @@ import { DataTable } from "@/components/ui/DataTable";
 import { Badge, type BadgeStatus } from "@/components/ui/Badge";
 import type { Column } from "@/components/ui/DataTable";
 import { IconPencil, IconTrash, IconChevronRight } from "@tabler/icons-react";
-import type { Case } from "@/db/types";
+import type { CaseWithAssignee } from "@/db/types";
 
-type CaseRow = Case & Record<string, unknown>;
+type CaseRow = CaseWithAssignee & Record<string, unknown>;
 
 const columns: Column<CaseRow>[] = [
   {
@@ -55,6 +55,18 @@ const columns: Column<CaseRow>[] = [
     render: (v) => <Badge status={v as BadgeStatus} />,
   },
   {
+    key: "assigneeEmail",
+    header: "Assigned To",
+    render: (_, row) => {
+      const display = row.assigneeName || row.assigneeEmail;
+      return display ? (
+        <span className="text-sm text-muted-foreground">{String(display)}</span>
+      ) : (
+        <span className="text-sm text-muted-foreground/40">—</span>
+      );
+    },
+  },
+  {
     key: "id",
     header: "Actions",
     align: "right",
@@ -80,7 +92,7 @@ const columns: Column<CaseRow>[] = [
   },
 ];
 
-export default function Table({ cases }: { cases: Case[] }) {
+export default function Table({ cases }: { cases: CaseWithAssignee[] }) {
   return (
     <DataTable
       columns={columns}

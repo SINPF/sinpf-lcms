@@ -128,10 +128,20 @@ export const caseReferrals = pgTable("case_referrals", {
   // Section 3: Status
   status:             caseStatusEnum("status").notNull().default("referred"),
 
+  // Assigned user (creator — set automatically on creation)
+  assignedTo:         text("assigned_to").references(() => user.id, { onDelete: "set null" }),
+
   // Timestamps
   createdAt:          timestamp("created_at").notNull().default(sql`now()`),
   updatedAt:          timestamp("updated_at").notNull().default(sql`now()`),
 });
+
+export const caseReferralRelations = relations(caseReferrals, ({ one }) => ({
+  assignee: one(user, {
+    fields: [caseReferrals.assignedTo],
+    references: [user.id],
+  }),
+}));
 
 // Case types (many-to-many — one case can have multiple types)
 export const caseReferralTypes = pgTable("case_referral_types", {

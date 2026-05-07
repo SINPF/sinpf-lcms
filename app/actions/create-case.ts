@@ -3,6 +3,8 @@
 import { db } from "@/db";
 import { caseReferrals, caseReferralTypes, caseAttachments } from "@/db/schema";
 import { uploadFile } from "@/lib/minio";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import path from "path";
 
 const TYPE_MAP: Record<string, "unpaid_contributions" | "unpaid_surcharges" | "wages_record"> = {
@@ -12,6 +14,9 @@ const TYPE_MAP: Record<string, "unpaid_contributions" | "unpaid_surcharges" | "w
 };
 
 export async function createCase(formData: FormData) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user.id) throw new Error("Not authenticated");
+
   const [newCase] = await db
     .insert(caseReferrals)
     .values({
@@ -22,6 +27,7 @@ export async function createCase(formData: FormData) {
       totalSurcharges: formData.get("totalSurcharges") as string,
       wagesRecord: formData.get("wagesRecord") as string,
       grandTotalClaim: formData.get("grandTotalClaim") as string,
+      assignedTo: session.user.id,
     })
     .returning({ id: caseReferrals.id });
 
