@@ -3,15 +3,19 @@
 import { useState } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { X, Maximize2, Minimize2 } from "lucide-react";
+import { X, Maximize2, Minimize2, Briefcase, ChevronLeft, ChevronRight } from "lucide-react";
 import { insertCaseSchema, CaseFormValues } from "@/db/validator";
 import { createCase } from "@/app/actions/create-case";
 import General from "./caseform-general";
+import CaseTypes from "./caseform-case-types";
+import UploadFiles from "./caseform-upload-files";
 import FinancialDetails from "./caseform-financial-details";
 
-const iconClasses = "w-4 h-4 transition-transform duration-200 active:scale-90";
-const btnClasses =
-  "p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-all flex items-center justify-center border border-transparent hover:border-border";
+const TABS = [
+  { step: "01", label: "Employer Info" },
+  { step: "02", label: "Type of Case" },
+  { step: "03", label: "Financial Details" },
+];
 
 function CaseFormHeader({
   onClose,
@@ -23,43 +27,95 @@ function CaseFormHeader({
   isMaximized: boolean;
 }) {
   return (
-    <header className="px-8 py-5 border-b border-border flex justify-between items-center bg-background transition-colors duration-300">
-      <div>
-        <h2 className="text-lg font-bold text-foreground tracking-tight font-heading">
-          Create New Case
-        </h2>
-        <div className="flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-          <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-70">
-            Legal Filing Portal
-          </p>
+    <header
+      className="px-8 py-5 flex justify-between items-center shrink-0"
+      style={{ background: "linear-gradient(135deg, #1e3d5f 0%, #162d48 100%)" }}
+    >
+      <div className="flex items-center gap-4">
+        <div className="w-10 h-10 rounded-xl bg-brand-blue/20 border border-brand-blue/30 flex items-center justify-center shrink-0">
+          <Briefcase className="w-5 h-5 text-brand-sky" />
+        </div>
+        <div>
+          <h2 className="text-base font-bold text-white tracking-tight leading-tight">
+            Create New Case
+          </h2>
+          <div className="flex items-center gap-2 mt-1">
+            <div className="w-1.5 h-1.5 rounded-full bg-brand-yellow animate-pulse" />
+            <p className="text-[10px] text-slate-400 uppercase tracking-widest font-black">
+              Legal Filing Portal
+            </p>
+          </div>
         </div>
       </div>
 
       <div className="flex items-center gap-2">
         <button
           onClick={onToggleExpand}
-          className={`${btnClasses} hover:bg-secondary/10 hover:text-secondary-foreground hover:border-secondary/20`}
+          className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 border border-transparent hover:border-white/10 transition-all flex items-center justify-center"
           title={isMaximized ? "Restore" : "Maximize"}
         >
-          {isMaximized ? <Minimize2 className={iconClasses} /> : <Maximize2 className={iconClasses} />}
+          {isMaximized
+            ? <Minimize2 className="w-4 h-4 active:scale-90" />
+            : <Maximize2 className="w-4 h-4 active:scale-90" />}
         </button>
         <button
           onClick={onClose}
-          className={`${btnClasses} hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20`}
+          className="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/15 border border-transparent hover:border-red-500/20 transition-all flex items-center justify-center"
           title="Close"
         >
-          <X className={iconClasses} />
+          <X className="w-4 h-4 active:scale-90" />
         </button>
       </div>
     </header>
   );
 }
 
+function TabBar({
+  activeTab,
+  onSelect,
+}: {
+  activeTab: number;
+  onSelect: (i: number) => void;
+}) {
+  return (
+    <div className="shrink-0 flex border-b border-border bg-background">
+      {TABS.map(({ step, label }, i) => {
+        const isActive = activeTab === i;
+        const isPast = i < activeTab;
+        return (
+          <button
+            key={i}
+            type="button"
+            onClick={() => onSelect(i)}
+            className={`relative flex items-center gap-2.5 px-6 py-3.5 text-sm font-medium transition-all border-b-2 -mb-px ${
+              isActive
+                ? "border-brand-blue text-brand-blue"
+                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+            }`}
+          >
+            <span
+              className={`w-5 h-5 rounded-md text-[10px] font-black flex items-center justify-center shrink-0 transition-colors ${
+                isActive
+                  ? "bg-brand-blue text-white"
+                  : isPast
+                  ? "bg-emerald-500 text-white"
+                  : "bg-muted text-muted-foreground"
+              }`}
+            >
+              {isPast ? "✓" : step}
+            </span>
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function CaseForm({ onClose }: { onClose: () => void }) {
   const [isMaximized, setIsMaximized] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
   const [files, setFiles] = useState<File[]>([]);
-
   const [error, setError] = useState<string | null>(null);
 
   const {
@@ -89,6 +145,8 @@ export default function CaseForm({ onClose }: { onClose: () => void }) {
     (watch("wagesRecord") || 0);
   const isWagesRecordSelected = selectedTypes.includes("Wages record");
   const canSave = !isWagesRecordSelected || files.length > 0;
+
+  const isLastTab = activeTab === TABS.length - 1;
 
   const onSubmit = async (data: CaseFormValues) => {
     if (!canSave) return;
@@ -123,56 +181,95 @@ export default function CaseForm({ onClose }: { onClose: () => void }) {
         isMaximized={isMaximized}
       />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-8 overflow-y-auto flex-1">
-        <div className="min-h-100 animate-in fade-in slide-in-from-bottom-2 duration-300 border-2 border-dashed border-border p-8 rounded-3xl bg-muted/30">
-          <h3 className="text-2xl font-bold text-foreground mb-6 font-heading">
-            Employer Information
-          </h3>
-          <General register={register} control={control} />
+      <TabBar activeTab={activeTab} onSelect={setActiveTab} />
 
-          <div className="mt-12">
-            <h3 className="text-2xl font-bold text-foreground mb-6 font-heading">
-              Financial Details
-            </h3>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-y-auto flex flex-col min-h-0">
+        <div className="flex-1 p-6 animate-in fade-in duration-200">
+          {activeTab === 0 && <General register={register} />}
+          {activeTab === 1 && (
+            <div className="space-y-6">
+              <CaseTypes control={control} />
+              {isWagesRecordSelected && (
+                <div className="pt-2 space-y-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-1 h-4 bg-brand-yellow rounded-full" />
+                    <h4 className="text-xs font-black text-foreground uppercase tracking-widest">
+                      Supporting Files
+                    </h4>
+                  </div>
+                  <UploadFiles files={files} setFiles={setFiles} />
+                  {files.length === 0 && (
+                    <div className="p-3.5 rounded-xl bg-brand-yellow/10 border border-brand-yellow/25 text-sm text-foreground font-semibold flex items-center gap-3">
+                      <span className="flex h-2 w-2 rounded-full bg-brand-yellow animate-pulse shrink-0" />
+                      Upload at least one file (PDF, Excel, or CSV) to continue.
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+          {activeTab === 2 && (
             <FinancialDetails
               register={register}
               grandTotal={grandTotal}
-              isWagesRecordSelected={isWagesRecordSelected}
-              files={files}
-              setFiles={setFiles}
             />
-          </div>
+          )}
+
+          {error && (
+            <div className="mt-4 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-500 font-medium">
+              {error}
+            </div>
+          )}
         </div>
 
-        {isWagesRecordSelected && files.length === 0 && (
-          <div className="p-4 rounded-xl bg-secondary/10 border border-secondary/20 text-sm text-secondary-foreground font-medium">
-            Wages Record is selected. Please upload at least one spreadsheet file (PDF, Excel, or CSV)
-            before saving.
+        {/* Footer */}
+        <div className="shrink-0 px-6 py-4 border-t border-border bg-muted/30 flex justify-between items-center gap-4">
+          <div className="flex items-center gap-2.5">
+            <div
+              className={`w-2 h-2 rounded-full ${
+                isSubmitSuccessful ? "bg-emerald-500" : "bg-amber-400"
+              } animate-pulse`}
+            />
+            <span className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">
+              {isSubmitSuccessful ? "Referred" : "Draft"}
+            </span>
           </div>
-        )}
 
-        {error && (
-          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-500 font-medium">
-            {error}
+          <div className="flex items-center gap-2">
+            {activeTab > 0 && (
+              <button
+                type="button"
+                onClick={() => setActiveTab((t) => t - 1)}
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted border border-border transition-all"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Back
+              </button>
+            )}
+
+            {!isLastTab ? (
+              <button
+                type="button"
+                onClick={() => setActiveTab((t) => t + 1)}
+                className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-sm font-bold bg-brand-blue text-white hover:bg-brand-blue/90 shadow-sm shadow-brand-blue/20 transition-all active:scale-95"
+              >
+                Next
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={!canSave || isSubmitting}
+                className={`px-8 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 ${
+                  canSave && !isSubmitting
+                    ? "bg-brand-blue text-white hover:bg-brand-blue/90 shadow-brand-blue/20"
+                    : "bg-muted text-muted-foreground cursor-not-allowed"
+                }`}
+              >
+                {isSubmitting ? "Saving…" : "Save Record"}
+              </button>
+            )}
           </div>
-        )}
-
-        <div className="flex justify-between items-center gap-4 pt-4">
-          <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
-            Status:{" "}
-            <span className="text-primary">{isSubmitSuccessful ? "Referred" : "Draft"}</span>
-          </span>
-          <button
-            type="submit"
-            disabled={!canSave || isSubmitting}
-            className={`px-10 py-4 rounded-xl font-bold transition-all shadow-lg font-heading active:scale-95 ${
-              canSave && !isSubmitting
-                ? "bg-primary text-primary-foreground hover:opacity-90 shadow-primary/20"
-                : "bg-muted text-muted-foreground cursor-not-allowed"
-            }`}
-          >
-            {isSubmitting ? "Saving…" : "Save Record"}
-          </button>
         </div>
       </form>
     </div>
