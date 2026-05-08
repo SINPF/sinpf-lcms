@@ -2,7 +2,7 @@ import { db } from "@/db";
 import { caseReferrals, caseReferralTypes, user } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import NavBar from "./navbar";
-import Table from "./table";
+import CasesClient from "./cases-client";
 
 export default async function CasesPage() {
   const [rows, allTypes] = await Promise.all([
@@ -40,7 +40,7 @@ export default async function CasesPage() {
   return (
     <>
       <NavBar />
-      <Table cases={cases} />
+      <CasesClient cases={cases} />
     </>
   );
 }
