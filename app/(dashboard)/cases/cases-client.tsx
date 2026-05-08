@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useRef, useEffect } from "react";
-import { Search, ChevronLeft, ChevronRight, ChevronDown, Check, ListFilter } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, ChevronDown, Check, ListFilter, UserCheck, X } from "lucide-react";
 import Table from "./table";
 import type { CaseWithAssignee } from "@/db/types";
 
@@ -95,7 +95,14 @@ export default function CasesClient({ cases, currentUserId }: { cases: CaseWithA
   const [query,    setQuery]    = useState("");
   const [status,   setStatus]   = useState("");
   const [caseType, setCaseType] = useState("");
+  const [myCases,  setMyCases]  = useState(false);
   const [page,     setPage]     = useState(1);
+
+  const hasActiveFilters = !!query || !!status || !!caseType || myCases;
+
+  const clearFilters = () => {
+    setQuery(""); setStatus(""); setCaseType(""); setMyCases(false); setPage(1);
+  };
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -103,18 +110,20 @@ export default function CasesClient({ cases, currentUserId }: { cases: CaseWithA
       const matchesQuery  = !q || c.employerName.toLowerCase().includes(q) || c.id.toLowerCase().includes(q);
       const matchesStatus = !status   || c.status === status;
       const matchesType   = !caseType || c.types.includes(caseType);
-      return matchesQuery && matchesStatus && matchesType;
+      const matchesMine   = !myCases  || c.assignedTo === currentUserId;
+      return matchesQuery && matchesStatus && matchesType && matchesMine;
     });
-  }, [cases, query, status, caseType]);
+  }, [cases, query, status, caseType, myCases, currentUserId]);
 
   const totalPages  = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const start       = (currentPage - 1) * PAGE_SIZE;
   const paginated   = filtered.slice(start, start + PAGE_SIZE);
 
-  const handleQuery    = (v: string) => { setQuery(v);    setPage(1); };
-  const handleStatus   = (v: string) => { setStatus(v);   setPage(1); };
-  const handleCaseType = (v: string) => { setCaseType(v); setPage(1); };
+  const handleQuery    = (v: string) => { setQuery(v);           setPage(1); };
+  const handleStatus   = (v: string) => { setStatus(v);          setPage(1); };
+  const handleCaseType = (v: string) => { setCaseType(v);        setPage(1); };
+  const handleMyCases  = ()          => { setMyCases((m) => !m); setPage(1); };
 
   return (
     <div className="space-y-4">
@@ -133,6 +142,35 @@ export default function CasesClient({ cases, currentUserId }: { cases: CaseWithA
 
         <FilterDropdown value={status}   options={STATUS_OPTIONS} onChange={handleStatus}   />
         <FilterDropdown value={caseType} options={TYPE_OPTIONS}   onChange={handleCaseType} />
+
+        <button
+          type="button"
+          onClick={handleMyCases}
+          className={`flex items-center gap-2 h-10 px-3.5 rounded-xl border text-sm font-medium transition-all ${
+            myCases
+              ? "border-brand-blue bg-brand-blue/5 text-brand-blue"
+              : "border-border bg-background text-foreground hover:border-brand-blue/50"
+          }`}
+        >
+          <UserCheck className="w-3.5 h-3.5 shrink-0" />
+          My Cases
+          <span className={`w-4 h-4 rounded flex items-center justify-center border transition-all ${
+            myCases ? "bg-brand-blue border-brand-blue" : "border-border"
+          }`}>
+            {myCases && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
+          </span>
+        </button>
+
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="flex items-center gap-1.5 h-10 px-3.5 rounded-xl border border-border bg-background text-sm font-medium text-muted-foreground hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all"
+          >
+            <X className="w-3.5 h-3.5" />
+            Clear
+          </button>
+        )}
       </div>
 
       {/* Table */}
