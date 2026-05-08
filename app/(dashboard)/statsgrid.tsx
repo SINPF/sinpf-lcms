@@ -9,7 +9,13 @@ import {
   IconTrendingUp,
   IconTrendingDown,
   IconMinus,
+  IconUser,
 } from "@tabler/icons-react";
+import { db } from "@/db";
+import { caseReferrals, caseReferralTypes } from "@/db/schema";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { eq, count } from "drizzle-orm";
 
 type Color = "blue" | "sky" | "yellow" | "emerald" | "violet" | "orange";
 
@@ -80,16 +86,61 @@ function DashboardStatCard({ label, value, description, icon, delta, color }: St
   );
 }
 
-const stats: StatCardProps[] = [
-  { label: "Contributions",    value: "10", description: "active cases", icon: <IconReceiptTax className="w-5 h-5" />, delta: 5,   color: "blue"    },
-  { label: "Surcharges",       value: "45", description: "active cases", icon: <IconCoin className="w-5 h-5" />,        delta: 12,  color: "sky"     },
-  { label: "Wages Record",     value: "10", description: "active cases", icon: <IconCash className="w-5 h-5" />,        delta: -2,  color: "yellow"  },
-  { label: "Trade Dispute",    value: "12", description: "active cases", icon: <IconScale className="w-5 h-5" />,       delta: 0,   color: "emerald" },
-  { label: "Land & Titles",    value: "2",  description: "active cases", icon: <IconHome className="w-5 h-5" />,        delta: -1,  color: "violet"  },
-  { label: "Rental Defaulters",value: "2",  description: "active cases", icon: <IconBuildingStore className="w-5 h-5" />, delta: 1, color: "orange"  },
-];
+export default async function StatsGrid() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  const userId = session?.user.id;
 
-export default function StatsGrid() {
+  const [typeCounts, assignedResult] = await Promise.all([
+    db
+      .select({ caseType: caseReferralTypes.caseType, total: count() })
+      .from(caseReferralTypes)
+      .groupBy(caseReferralTypes.caseType),
+
+    userId
+      ? db
+          .select({ total: count() })
+          .from(caseReferrals)
+          .where(eq(caseReferrals.assignedTo, userId))
+      : Promise.resolve([{ total: 0 }]),
+  ]);
+
+  const byType = Object.fromEntries(typeCounts.map((r) => [r.caseType, r.total]));
+  const assignedCount = assignedResult[0]?.total ?? 0;
+
+  const stats: StatCardProps[] = [
+    {
+      label: "Assigned to Me",
+      value: String(assignedCount),
+      description: "cases assigned to you",
+      icon: <IconUser className="w-5 h-5" />,
+      color: "emerald",
+    },
+    {
+      label: "Contributions",
+      value: String(byType["unpaid_contributions"] ?? 0),
+      description: "cases",
+      icon: <IconReceiptTax className="w-5 h-5" />,
+      color: "blue",
+    },
+    {
+      label: "Surcharges",
+      value: String(byType["unpaid_surcharges"] ?? 0),
+      description: "cases",
+      icon: <IconCoin className="w-5 h-5" />,
+      color: "sky",
+    },
+    {
+      label: "Wages Record",
+      value: String(byType["wages_record"] ?? 0),
+      description: "cases",
+      icon: <IconCash className="w-5 h-5" />,
+      color: "yellow",
+    },
+    // { label: "Trade Dispute",     value: "0", description: "active cases", icon: <IconScale className="w-5 h-5" />,        color: "emerald" },
+    // { label: "Land & Titles",     value: "0", description: "active cases", icon: <IconHome className="w-5 h-5" />,         color: "violet"  },
+    // { label: "Rental Defaulters", value: "0", description: "active cases", icon: <IconBuildingStore className="w-5 h-5" />, color: "orange"  },
+  ];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
       {stats.map((stat) => (
