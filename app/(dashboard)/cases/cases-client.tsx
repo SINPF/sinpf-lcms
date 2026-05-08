@@ -173,6 +173,13 @@ export default function CasesClient({ cases, currentUserId }: { cases: CaseWithA
         )}
       </div>
 
+      {/* Filtered count — only shown when filters are active */}
+      {hasActiveFilters && (
+        <p className="px-1 text-sm text-muted-foreground">
+          {filtered.length} of {cases.length} {cases.length === 1 ? "case" : "cases"} matched
+        </p>
+      )}
+
       {/* Table */}
       <Table cases={paginated} currentUserId={currentUserId} />
 
