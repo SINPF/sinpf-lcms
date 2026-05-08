@@ -84,7 +84,7 @@ function StatusDropdown({
   );
 }
 
-export default function CasesClient({ cases }: { cases: CaseWithAssignee[] }) {
+export default function CasesClient({ cases, currentUserId }: { cases: CaseWithAssignee[]; currentUserId: string | null }) {
   const [query, setQuery]   = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage]     = useState(1);
@@ -128,7 +128,7 @@ export default function CasesClient({ cases }: { cases: CaseWithAssignee[] }) {
       </div>
 
       {/* Table */}
-      <Table cases={paginated} />
+      <Table cases={paginated} currentUserId={currentUserId} />
 
       {/* Pagination */}
       <div className="flex items-center justify-between px-1">

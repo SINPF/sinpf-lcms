@@ -1,10 +1,15 @@
 import { db } from "@/db";
 import { caseReferrals, caseReferralTypes, user } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import NavBar from "./navbar";
 import CasesClient from "./cases-client";
 
 export default async function CasesPage() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  const currentUserId = session?.user.id ?? null;
+
   const [rows, allTypes] = await Promise.all([
     db
       .select({
@@ -40,7 +45,7 @@ export default async function CasesPage() {
   return (
     <>
       <NavBar />
-      <CasesClient cases={cases} />
+      <CasesClient cases={cases} currentUserId={currentUserId} />
     </>
   );
 }
