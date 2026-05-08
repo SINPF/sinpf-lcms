@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { DataTable } from "@/components/ui/DataTable";
 import { Badge, type BadgeStatus } from "@/components/ui/Badge";
 import type { Column } from "@/components/ui/DataTable";
@@ -93,6 +95,15 @@ const columns: Column<CaseRow>[] = [
 ];
 
 export default function Table({ cases }: { cases: CaseWithAssignee[] }) {
+  const router = useRouter();
+
+  useEffect(() => {
+    const es = new EventSource("/api/cases/stream");
+    es.onmessage = () => router.refresh();
+    es.onerror = () => es.close();
+    return () => es.close();
+  }, [router]);
+
   return (
     <DataTable
       columns={columns}

@@ -5,6 +5,8 @@ import { caseReferrals, caseReferralTypes, caseAttachments } from "@/db/schema";
 import { uploadFile } from "@/lib/minio";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { revalidatePath } from "next/cache";
+import caseEvents from "@/lib/case-events";
 import path from "path";
 
 const TYPE_MAP: Record<string, "unpaid_contributions" | "unpaid_surcharges" | "wages_record"> = {
@@ -56,6 +58,9 @@ export async function createCase(formData: FormData) {
       });
     }
   }
+
+  revalidatePath("/cases");
+  caseEvents.emit("cases:updated");
 
   return { caseId: newCase.id };
 }
