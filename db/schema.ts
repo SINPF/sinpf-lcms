@@ -98,9 +98,8 @@ export const caseTypeEnum = pgEnum("case_type", [
   "wages_record",
 ]);
 
-// Lifecycle stages — `referred` is the initial stage on registration
 export const caseStatusEnum = pgEnum("case_status", [
-  "referred",
+  "registered",
   "assessment",
   "demand_issued",
   "negotiation",
@@ -172,7 +171,7 @@ export const caseReferrals = pgTable("case_referrals", {
   wagesRecord:        numeric("wages_record",        { precision: 15, scale: 2 }).notNull().default("0"),
   grandTotalClaim:    numeric("grand_total_claim",   { precision: 15, scale: 2 }).notNull().default("0"),
 
-  status:             caseStatusEnum("status").notNull().default("referred"),
+  status:             caseStatusEnum("status").notNull().default("registered"),
   assignedTo:         text("assigned_to").references(() => user.id, { onDelete: "set null" }),
 
   createdAt:          timestamp("created_at").notNull().default(sql`now()`),

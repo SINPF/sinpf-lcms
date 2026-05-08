@@ -9,7 +9,7 @@ import { eq } from "drizzle-orm";
 import caseEvents from "@/lib/case-events";
 
 export type CaseStage =
-  | "referred"
+  | "registered"
   | "assessment"
   | "demand_issued"
   | "negotiation"

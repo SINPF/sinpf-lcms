@@ -16,7 +16,7 @@ import { addCaseActivity } from "@/app/actions/add-case-activity";
 // ─── Stage config ─────────────────────────────────────────────────────────────
 
 const STAGES: { key: CaseStage; label: string; icon: React.ReactNode }[] = [
-  { key: "referred",     label: "Registered",    icon: <FileText className="w-4 h-4" /> },
+  { key: "registered",   label: "Registered",    icon: <FileText className="w-4 h-4" /> },
   { key: "assessment",   label: "Assessment",    icon: <ScrollText className="w-4 h-4" /> },
   { key: "demand_issued",label: "Demand Issued", icon: <FileText className="w-4 h-4" /> },
   { key: "negotiation",  label: "Negotiation",   icon: <HandshakeIcon className="w-4 h-4" /> },
@@ -95,7 +95,7 @@ function StageActions({ caseId, status }: { caseId: string; status: string }) {
   };
 
   const NEXT_ACTIONS: Record<string, { label: string; stage: CaseStage; optional?: boolean }[]> = {
-    referred:      [{ label: "Begin Assessment", stage: "assessment" }],
+    registered:    [{ label: "Begin Assessment", stage: "assessment" }],
     assessment:    [
       { label: "Issue Demand Letter", stage: "demand_issued", optional: true },
       { label: "Enter Negotiation",   stage: "negotiation",   optional: true },
