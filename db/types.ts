@@ -11,6 +11,7 @@ export type Case = InferSelectModel<typeof caseReferrals>;
 export type CaseWithAssignee = Case & {
   assigneeName: string | null;
   assigneeEmail: string | null;
+  types: string[];
 };
 
 export type CaseActivity = InferSelectModel<typeof caseActivities>;

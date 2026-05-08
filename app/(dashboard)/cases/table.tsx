@@ -28,6 +28,26 @@ const columns: Column<CaseRow>[] = [
     ),
   },
   {
+    key: "types",
+    header: "Case Types",
+    render: (v) => {
+      const types = v as string[];
+      if (!types?.length) return <span className="text-muted-foreground/40 text-sm">—</span>;
+      return (
+        <div className="flex flex-wrap gap-1">
+          {types.map((t) => (
+            <span
+              key={t}
+              className="inline-block px-2 py-0.5 rounded-full bg-brand-blue/10 text-brand-blue text-[10px] font-bold uppercase tracking-wider"
+            >
+              {t.replace(/_/g, " ")}
+            </span>
+          ))}
+        </div>
+      );
+    },
+  },
+  {
     key: "employerCode",
     header: "Code",
     render: (v) => (
