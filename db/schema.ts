@@ -157,13 +157,29 @@ export const closureReasonEnum = pgEnum("closure_reason", [
 ]);
 
 
+// ─── Employers ────────────────────────────────────────────────────────────────
+
+export const employers = pgTable("employers", {
+  id:        text("id").primaryKey().default(sql`gen_random_uuid()`),
+  name:      text("name").notNull().unique(),
+  code:      text("code").notNull().unique(),
+  phone:     text("phone"),
+  address:   text("address"),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+  updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
+});
+
+export const employerRelations = relations(employers, ({ many }) => ({
+  cases: many(caseReferrals),
+}));
+
+
 // ─── Case Referrals ───────────────────────────────────────────────────────────
 
 export const caseReferrals = pgTable("case_referrals", {
   id:                 text("id").primaryKey().default(sql`gen_random_uuid()`),
 
-  employerName:       text("employer_name").notNull(),
-  employerCode:       text("employer_code").notNull(),
+  employerId:         text("employer_id").notNull().references(() => employers.id, { onDelete: "restrict" }),
   referralDate:       date("referral_date").notNull().default(sql`CURRENT_DATE`),
 
   totalContributions: numeric("total_contributions", { precision: 15, scale: 2 }).notNull().default("0"),
@@ -179,6 +195,7 @@ export const caseReferrals = pgTable("case_referrals", {
 });
 
 export const caseReferralRelations = relations(caseReferrals, ({ one, many }) => ({
+  employer:    one(employers, { fields: [caseReferrals.employerId], references: [employers.id] }),
   assignee:    one(user, { fields: [caseReferrals.assignedTo], references: [user.id] }),
   types:       many(caseReferralTypes),
   attachments: many(caseAttachments),

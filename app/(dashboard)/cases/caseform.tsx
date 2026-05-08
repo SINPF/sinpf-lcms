@@ -123,12 +123,12 @@ export default function CaseForm({ onClose }: { onClose: () => void }) {
     control,
     handleSubmit,
     watch,
+    setValue,
     formState: { isSubmitSuccessful, isSubmitting },
   } = useForm<CaseFormValues>({
     resolver: zodResolver(insertCaseSchema) as Resolver<CaseFormValues>,
     defaultValues: {
-      employerName: "",
-      employerCode: "",
+      employerId: "",
       referralDate: new Date().toISOString().split("T")[0],
       selectedTypes: [],
       totalContributions: 0,
@@ -153,8 +153,7 @@ export default function CaseForm({ onClose }: { onClose: () => void }) {
     setError(null);
     try {
       const formData = new FormData();
-      formData.append("employerName", data.employerName);
-      formData.append("employerCode", data.employerCode);
+      formData.append("employerId",   data.employerId);
       formData.append("referralDate", data.referralDate ?? "");
       formData.append("totalContributions", String(data.totalContributions));
       formData.append("totalSurcharges", String(data.totalSurcharges));
@@ -185,7 +184,7 @@ export default function CaseForm({ onClose }: { onClose: () => void }) {
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-y-auto flex flex-col min-h-0">
         <div className="flex-1 p-6 animate-in fade-in duration-200">
-          {activeTab === 0 && <General register={register} />}
+          {activeTab === 0 && <General register={register} setValue={setValue} watch={watch} />}
           {activeTab === 1 && (
             <div className="space-y-6">
               <CaseTypes control={control} />

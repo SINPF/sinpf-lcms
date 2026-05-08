@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { caseReferrals, caseReferralTypes, user } from "@/db/schema";
+import { caseReferrals, caseReferralTypes, employers, user } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
@@ -19,12 +19,13 @@ export default async function CasesPage({
   const initialMyCases  = params.mine === "1";
   const initialCaseType = params.type ?? "";
 
-  const [rows, allTypes] = await Promise.all([
+  const [rows, allTypes, allEmployers] = await Promise.all([
     db
       .select({
         id: caseReferrals.id,
-        employerName: caseReferrals.employerName,
-        employerCode: caseReferrals.employerCode,
+        employerId: caseReferrals.employerId,
+        employerName: employers.name,
+        employerCode: employers.code,
         referralDate: caseReferrals.referralDate,
         totalContributions: caseReferrals.totalContributions,
         totalSurcharges: caseReferrals.totalSurcharges,
@@ -38,10 +39,12 @@ export default async function CasesPage({
         assigneeEmail: user.email,
       })
       .from(caseReferrals)
+      .innerJoin(employers, eq(caseReferrals.employerId, employers.id))
       .leftJoin(user, eq(caseReferrals.assignedTo, user.id))
       .orderBy(desc(caseReferrals.createdAt)),
 
     db.select().from(caseReferralTypes),
+    db.select({ id: employers.id, name: employers.name, code: employers.code }).from(employers).orderBy(employers.name),
   ]);
 
   const typesByCaseId = allTypes.reduce<Record<string, string[]>>((acc, t) => {
@@ -56,6 +59,7 @@ export default async function CasesPage({
       <NavBar />
       <CasesClient
         cases={cases}
+        employers={allEmployers}
         currentUserId={currentUserId}
         initialMyCases={initialMyCases}
         initialCaseType={initialCaseType}

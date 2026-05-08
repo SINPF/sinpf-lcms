@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { IconLayoutDashboard, IconBriefcase, IconLogout } from "@tabler/icons-react";
+import { IconLayoutDashboard, IconBriefcase, IconBuilding, IconLogout } from "@tabler/icons-react";
 import { authClient } from "@/lib/auth-client";
 import { Sidebar } from "@/components/ui/Sidebar";
 
@@ -11,7 +11,8 @@ const NAV_SECTIONS = [
     title: "Main",
     items: [
       { label: "Dashboard", href: "/", icon: <IconLayoutDashboard className="w-4 h-4" strokeWidth={2} /> },
-      { label: "Cases", href: "/cases", icon: <IconBriefcase className="w-4 h-4" strokeWidth={2} /> },
+      { label: "Cases",     href: "/cases",     icon: <IconBriefcase className="w-4 h-4" strokeWidth={2} /> },
+      { label: "Employers", href: "/employers", icon: <IconBuilding  className="w-4 h-4" strokeWidth={2} /> },
     ],
   },
 ];

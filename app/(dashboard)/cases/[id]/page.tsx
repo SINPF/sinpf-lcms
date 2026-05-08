@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { db } from "@/db";
-import { caseReferrals, caseReferralTypes, caseActivities, caseProceedings, caseClosure, user } from "@/db/schema";
+import { caseReferrals, caseReferralTypes, caseActivities, caseProceedings, caseClosure, employers, user } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import CaseDetailClient from "./case-detail-client";
 import type { CaseDetail } from "@/db/types";
@@ -11,8 +11,9 @@ export default async function CaseDetailPage({ params }: { params: Promise<{ id:
   const [row] = await db
     .select({
       id: caseReferrals.id,
-      employerName: caseReferrals.employerName,
-      employerCode: caseReferrals.employerCode,
+      employerId: caseReferrals.employerId,
+      employerName: employers.name,
+      employerCode: employers.code,
       referralDate: caseReferrals.referralDate,
       totalContributions: caseReferrals.totalContributions,
       totalSurcharges: caseReferrals.totalSurcharges,
@@ -26,6 +27,7 @@ export default async function CaseDetailPage({ params }: { params: Promise<{ id:
       assigneeEmail: user.email,
     })
     .from(caseReferrals)
+    .innerJoin(employers, eq(caseReferrals.employerId, employers.id))
     .leftJoin(user, eq(caseReferrals.assignedTo, user.id))
     .where(eq(caseReferrals.id, id));
 

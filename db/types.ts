@@ -4,13 +4,17 @@ import {
   caseActivities,
   caseProceedings,
   caseClosure,
+  employers,
 } from "./schema";
 
 export type Case = InferSelectModel<typeof caseReferrals>;
+export type Employer = InferSelectModel<typeof employers>;
 
 export type CaseWithAssignee = Case & {
   assigneeName: string | null;
   assigneeEmail: string | null;
+  employerName: string;
+  employerCode: string;
   types: string[];
 };
 
@@ -31,6 +35,8 @@ export type CaseProceedingWithUser = CaseProceeding & {
 export type CaseDetail = Case & {
   assigneeName: string | null;
   assigneeEmail: string | null;
+  employerName: string;
+  employerCode: string;
   types: string[];
   activities: CaseActivityWithUser[];
   proceedings: CaseProceedingWithUser[];

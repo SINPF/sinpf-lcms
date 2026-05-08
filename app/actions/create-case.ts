@@ -22,8 +22,7 @@ export async function createCase(formData: FormData) {
   const [newCase] = await db
     .insert(caseReferrals)
     .values({
-      employerName: formData.get("employerName") as string,
-      employerCode: formData.get("employerCode") as string,
+      employerId:   formData.get("employerId")   as string,
       referralDate: formData.get("referralDate") as string,
       totalContributions: formData.get("totalContributions") as string,
       totalSurcharges: formData.get("totalSurcharges") as string,
