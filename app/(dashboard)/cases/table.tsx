@@ -10,7 +10,27 @@ import type { CaseWithAssignee } from "@/db/types";
 
 type CaseRow = CaseWithAssignee & Record<string, unknown>;
 
-export default function Table({ cases, currentUserId }: { cases: CaseWithAssignee[]; currentUserId?: string | null }) {
+function highlight(text: string, query: string) {
+  const q = query.trim();
+  if (!q) return <>{text}</>;
+  const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const parts = text.split(new RegExp(`(${escaped})`, "gi"));
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.toLowerCase() === q.toLowerCase() ? (
+          <mark key={i} className="bg-brand-yellow/50 text-foreground not-italic rounded-sm px-px">
+            {part}
+          </mark>
+        ) : (
+          part
+        )
+      )}
+    </>
+  );
+}
+
+export default function Table({ cases, currentUserId, query = "" }: { cases: CaseWithAssignee[]; currentUserId?: string | null; query?: string }) {
   const router = useRouter();
 
   const columns: Column<CaseRow>[] = [
@@ -19,7 +39,7 @@ export default function Table({ cases, currentUserId }: { cases: CaseWithAssigne
       header: "Case ID",
       render: (v) => (
         <span className="font-mono text-[11px] text-muted-foreground tracking-tight">
-          {String(v).slice(0, 8).toUpperCase()}
+          {highlight(String(v).slice(0, 8).toUpperCase(), query)}
         </span>
       ),
     },
@@ -27,7 +47,9 @@ export default function Table({ cases, currentUserId }: { cases: CaseWithAssigne
       key: "employerName",
       header: "Employer",
       render: (v) => (
-        <span className="text-sm font-medium text-foreground">{String(v)}</span>
+        <span className="text-sm font-medium text-foreground">
+          {highlight(String(v), query)}
+        </span>
       ),
     },
     {

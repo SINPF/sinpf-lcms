@@ -181,7 +181,7 @@ export default function CasesClient({ cases, currentUserId }: { cases: CaseWithA
       )}
 
       {/* Table */}
-      <Table cases={paginated} currentUserId={currentUserId} />
+      <Table cases={paginated} currentUserId={currentUserId} query={query} />
 
       {/* Pagination */}
       <div className="flex items-center justify-between px-1">
