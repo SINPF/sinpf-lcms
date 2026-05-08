@@ -91,11 +91,21 @@ function FilterDropdown({
   );
 }
 
-export default function CasesClient({ cases, currentUserId }: { cases: CaseWithAssignee[]; currentUserId: string | null }) {
+export default function CasesClient({
+  cases,
+  currentUserId,
+  initialMyCases  = false,
+  initialCaseType = "",
+}: {
+  cases: CaseWithAssignee[];
+  currentUserId: string | null;
+  initialMyCases?: boolean;
+  initialCaseType?: string;
+}) {
   const [query,    setQuery]    = useState("");
   const [status,   setStatus]   = useState("");
-  const [caseType, setCaseType] = useState("");
-  const [myCases,  setMyCases]  = useState(false);
+  const [caseType, setCaseType] = useState(initialCaseType);
+  const [myCases,  setMyCases]  = useState(initialMyCases);
   const [page,     setPage]     = useState(1);
 
   const hasActiveFilters = !!query || !!status || !!caseType || myCases;

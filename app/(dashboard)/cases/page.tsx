@@ -6,9 +6,18 @@ import { headers } from "next/headers";
 import NavBar from "./navbar";
 import CasesClient from "./cases-client";
 
-export default async function CasesPage() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  const currentUserId = session?.user.id ?? null;
+export default async function CasesPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ mine?: string; type?: string }>;
+}) {
+  const [session, params] = await Promise.all([
+    auth.api.getSession({ headers: await headers() }),
+    searchParams ?? Promise.resolve({} as { mine?: string; type?: string }),
+  ]);
+  const currentUserId   = session?.user.id ?? null;
+  const initialMyCases  = params.mine === "1";
+  const initialCaseType = params.type ?? "";
 
   const [rows, allTypes] = await Promise.all([
     db
@@ -45,7 +54,12 @@ export default async function CasesPage() {
   return (
     <>
       <NavBar />
-      <CasesClient cases={cases} currentUserId={currentUserId} />
+      <CasesClient
+        cases={cases}
+        currentUserId={currentUserId}
+        initialMyCases={initialMyCases}
+        initialCaseType={initialCaseType}
+      />
     </>
   );
 }
