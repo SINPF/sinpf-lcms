@@ -15,6 +15,7 @@ interface DataTableProps<T extends Record<string, unknown>> {
   emptyMessage?: string;
   loading?: boolean;
   className?: string;
+  onRowClick?: (row: T) => void;
 }
 
 const alignClass = {
@@ -30,6 +31,7 @@ export function DataTable<T extends Record<string, unknown>>({
   emptyMessage = "No records found.",
   loading = false,
   className = "",
+  onRowClick,
 }: DataTableProps<T>) {
   return (
     <div className={`w-full overflow-x-auto rounded-2xl border border-border ${className}`}>
@@ -73,7 +75,8 @@ export function DataTable<T extends Record<string, unknown>>({
             data.map((row) => (
               <tr
                 key={String(row[keyField])}
-                className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors"
+                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                className={`border-b border-border last:border-0 hover:bg-muted/20 transition-colors ${onRowClick ? "cursor-pointer" : ""}`}
               >
                 {columns.map((col, i) => (
                   <td

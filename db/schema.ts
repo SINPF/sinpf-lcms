@@ -77,85 +77,189 @@ export const verification = pgTable(
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
+  activities: many(caseActivities, { relationName: "performer" }),
+  proceedings: many(caseProceedings, { relationName: "proceedingPerformer" }),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
-  user: one(user, {
-    fields: [session.userId],
-    references: [user.id],
-  }),
+  user: one(user, { fields: [session.userId], references: [user.id] }),
 }));
 
 export const accountRelations = relations(account, ({ one }) => ({
-  user: one(user, {
-    fields: [account.userId],
-    references: [user.id],
-  }),
+  user: one(user, { fields: [account.userId], references: [user.id] }),
 }));
 
 
-// Enums
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
 export const caseTypeEnum = pgEnum("case_type", [
   "unpaid_contributions",
   "unpaid_surcharges",
   "wages_record",
 ]);
 
+// Lifecycle stages — `referred` is the initial stage on registration
 export const caseStatusEnum = pgEnum("case_status", [
   "referred",
+  "assessment",
+  "demand_issued",
+  "negotiation",
+  "prosecution",
   "in_progress",
   "resolved",
   "closed",
 ]);
 
-// Main case referral table
+export const activityTypeEnum = pgEnum("activity_type", [
+  "stage_changed",
+  "assessment_completed",
+  "demand_letter_issued",
+  "negotiation_entered",
+  "negotiation_completed",
+  "prosecution_filed",
+  "hearing_scheduled",
+  "consent_order_entered",
+  "default_judgment_filed",
+  "enforcement_filed",
+  "case_discontinued",
+  "case_closed",
+  "document_added",
+  "note_added",
+]);
+
+export const courtTypeEnum = pgEnum("court_type", [
+  "high_court",
+  "magistrates_court",
+]);
+
+export const proceedingTypeEnum = pgEnum("proceeding_type", [
+  "trial",
+  "hearing",
+  "mention",
+  "consent_order",
+  "default_judgment",
+  "enforcement",
+  "discontinued",
+]);
+
+export const closureTypeEnum = pgEnum("closure_type", [
+  "prosecution_completed",
+  "settlement_completed",
+  "other",
+]);
+
+export const closureReasonEnum = pgEnum("closure_reason", [
+  "statute_barred",
+  "incomplete_for_prosecution",
+  "employer_complied",
+  "withdrawn_by_sinpf",
+  "settled_out_of_court",
+  "other",
+]);
+
+
+// ─── Case Referrals ───────────────────────────────────────────────────────────
+
 export const caseReferrals = pgTable("case_referrals", {
   id:                 text("id").primaryKey().default(sql`gen_random_uuid()`),
 
-  // Section 1: Employer Info
   employerName:       text("employer_name").notNull(),
   employerCode:       text("employer_code").notNull(),
   referralDate:       date("referral_date").notNull().default(sql`CURRENT_DATE`),
 
-  // Section 2: Financials
   totalContributions: numeric("total_contributions", { precision: 15, scale: 2 }).notNull().default("0"),
   totalSurcharges:    numeric("total_surcharges",    { precision: 15, scale: 2 }).notNull().default("0"),
   wagesRecord:        numeric("wages_record",        { precision: 15, scale: 2 }).notNull().default("0"),
   grandTotalClaim:    numeric("grand_total_claim",   { precision: 15, scale: 2 }).notNull().default("0"),
-  // grandTotalClaim = totalContributions + totalSurcharges + wagesRecord
-  // Computed on the application layer before insert/update
 
-  // Section 3: Status
   status:             caseStatusEnum("status").notNull().default("referred"),
-
-  // Assigned user (creator — set automatically on creation)
   assignedTo:         text("assigned_to").references(() => user.id, { onDelete: "set null" }),
 
-  // Timestamps
   createdAt:          timestamp("created_at").notNull().default(sql`now()`),
   updatedAt:          timestamp("updated_at").notNull().default(sql`now()`),
 });
 
-export const caseReferralRelations = relations(caseReferrals, ({ one }) => ({
-  assignee: one(user, {
-    fields: [caseReferrals.assignedTo],
-    references: [user.id],
-  }),
+export const caseReferralRelations = relations(caseReferrals, ({ one, many }) => ({
+  assignee:    one(user, { fields: [caseReferrals.assignedTo], references: [user.id] }),
+  types:       many(caseReferralTypes),
+  attachments: many(caseAttachments),
+  activities:  many(caseActivities),
+  proceedings: many(caseProceedings),
+  closure:     one(caseClosure),
 }));
 
-// Case types (many-to-many — one case can have multiple types)
+
+// ─── Case Types (many-to-many) ────────────────────────────────────────────────
+
 export const caseReferralTypes = pgTable("case_referral_types", {
   id:             text("id").primaryKey().default(sql`gen_random_uuid()`),
   caseReferralId: text("case_referral_id").notNull().references(() => caseReferrals.id, { onDelete: "cascade" }),
   caseType:       caseTypeEnum("case_type").notNull(),
 });
 
-// Attachments
+
+// ─── Attachments ──────────────────────────────────────────────────────────────
+
 export const caseAttachments = pgTable("case_attachments", {
   id:             text("id").primaryKey().default(sql`gen_random_uuid()`),
   caseReferralId: text("case_referral_id").notNull().references(() => caseReferrals.id, { onDelete: "cascade" }),
   fileName:       text("file_name").notNull(),
-  fileType:       text("file_type").notNull(),   // "pdf" | "excel" | "csv"
-  fileUrl:        text("file_url").notNull(),     // path or storage URL
+  fileType:       text("file_type").notNull(),
+  fileUrl:        text("file_url").notNull(),
   uploadedAt:     timestamp("uploaded_at").notNull().default(sql`now()`),
 });
+
+
+// ─── Activity Log ─────────────────────────────────────────────────────────────
+
+export const caseActivities = pgTable("case_activities", {
+  id:             text("id").primaryKey().default(sql`gen_random_uuid()`),
+  caseReferralId: text("case_referral_id").notNull().references(() => caseReferrals.id, { onDelete: "cascade" }),
+  activityType:   activityTypeEnum("activity_type").notNull(),
+  notes:          text("notes"),
+  performedBy:    text("performed_by").references(() => user.id, { onDelete: "set null" }),
+  createdAt:      timestamp("created_at").notNull().default(sql`now()`),
+});
+
+export const caseActivityRelations = relations(caseActivities, ({ one }) => ({
+  case:      one(caseReferrals, { fields: [caseActivities.caseReferralId], references: [caseReferrals.id] }),
+  performer: one(user, { fields: [caseActivities.performedBy], references: [user.id], relationName: "performer" }),
+}));
+
+
+// ─── Court Proceedings ────────────────────────────────────────────────────────
+
+export const caseProceedings = pgTable("case_proceedings", {
+  id:             text("id").primaryKey().default(sql`gen_random_uuid()`),
+  caseReferralId: text("case_referral_id").notNull().references(() => caseReferrals.id, { onDelete: "cascade" }),
+  proceedingType: proceedingTypeEnum("proceeding_type").notNull(),
+  court:          courtTypeEnum("court").notNull(),
+  hearingDate:    date("hearing_date"),
+  nextDate:       date("next_date"),
+  outcomeNotes:   text("outcome_notes"),
+  performedBy:    text("performed_by").references(() => user.id, { onDelete: "set null" }),
+  createdAt:      timestamp("created_at").notNull().default(sql`now()`),
+});
+
+export const caseProceedingRelations = relations(caseProceedings, ({ one }) => ({
+  case:      one(caseReferrals, { fields: [caseProceedings.caseReferralId], references: [caseReferrals.id] }),
+  performer: one(user, { fields: [caseProceedings.performedBy], references: [user.id], relationName: "proceedingPerformer" }),
+}));
+
+
+// ─── Case Closure ─────────────────────────────────────────────────────────────
+
+export const caseClosure = pgTable("case_closure", {
+  id:             text("id").primaryKey().default(sql`gen_random_uuid()`),
+  caseReferralId: text("case_referral_id").notNull().unique().references(() => caseReferrals.id, { onDelete: "cascade" }),
+  closureType:    closureTypeEnum("closure_type").notNull(),
+  closureReason:  closureReasonEnum("closure_reason"),
+  notes:          text("notes"),
+  closedBy:       text("closed_by").references(() => user.id, { onDelete: "set null" }),
+  closedAt:       timestamp("closed_at").notNull().default(sql`now()`),
+});
+
+export const caseClosureRelations = relations(caseClosure, ({ one }) => ({
+  case:     one(caseReferrals, { fields: [caseClosure.caseReferralId], references: [caseReferrals.id] }),
+  closedBy: one(user, { fields: [caseClosure.closedBy], references: [user.id] }),
+}));

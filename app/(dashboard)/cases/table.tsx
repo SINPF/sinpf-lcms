@@ -73,7 +73,7 @@ const columns: Column<CaseRow>[] = [
     header: "Actions",
     align: "right",
     render: (_, row) => (
-      <div className="flex items-center justify-end gap-1">
+      <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={() => console.log("Edit", row.id)}
           className="p-1.5 text-muted-foreground hover:text-brand-blue hover:bg-brand-blue/5 rounded-lg transition-all"
@@ -110,6 +110,7 @@ export default function Table({ cases }: { cases: CaseWithAssignee[] }) {
       data={cases as CaseRow[]}
       keyField="id"
       emptyMessage="No cases found."
+      onRowClick={(row) => router.push(`/cases/${row.id}`)}
     />
   );
 }
