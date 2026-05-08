@@ -8,22 +8,31 @@ import type { CaseWithAssignee } from "@/db/types";
 const PAGE_SIZE = 25;
 
 const STATUS_OPTIONS: { value: string; label: string; dot: string }[] = [
-  { value: "",              label: "All Statuses",  dot: "bg-slate-300"    },
-  { value: "registered",   label: "Registered",    dot: "bg-blue-500"     },
-  { value: "assessment",   label: "Assessment",    dot: "bg-sky-500"      },
-  { value: "demand_issued",label: "Demand Issued", dot: "bg-amber-500"    },
-  { value: "negotiation",  label: "Negotiation",   dot: "bg-orange-500"   },
-  { value: "prosecution",  label: "Prosecution",   dot: "bg-red-500"      },
-  { value: "in_progress",  label: "In Progress",   dot: "bg-emerald-500"  },
-  { value: "resolved",     label: "Resolved",      dot: "bg-teal-500"     },
-  { value: "closed",       label: "Closed",        dot: "bg-slate-400"    },
+  { value: "",              label: "All Statuses",  dot: "bg-slate-300"   },
+  { value: "registered",   label: "Registered",    dot: "bg-blue-500"    },
+  { value: "assessment",   label: "Assessment",    dot: "bg-sky-500"     },
+  { value: "demand_issued",label: "Demand Issued", dot: "bg-amber-500"   },
+  { value: "negotiation",  label: "Negotiation",   dot: "bg-orange-500"  },
+  { value: "prosecution",  label: "Prosecution",   dot: "bg-red-500"     },
+  { value: "in_progress",  label: "In Progress",   dot: "bg-emerald-500" },
+  { value: "resolved",     label: "Resolved",      dot: "bg-teal-500"    },
+  { value: "closed",       label: "Closed",        dot: "bg-slate-400"   },
 ];
 
-function StatusDropdown({
+const TYPE_OPTIONS: { value: string; label: string; dot: string }[] = [
+  { value: "",                    label: "All Types",       dot: "bg-slate-300"  },
+  { value: "unpaid_contributions",label: "Contributions",   dot: "bg-brand-blue" },
+  { value: "unpaid_surcharges",   label: "Surcharges",      dot: "bg-brand-sky"  },
+  { value: "wages_record",        label: "Wages Record",    dot: "bg-amber-500"  },
+];
+
+function FilterDropdown({
   value,
+  options,
   onChange,
 }: {
   value: string;
+  options: { value: string; label: string; dot: string }[];
   onChange: (v: string) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -31,15 +40,13 @@ function StatusDropdown({
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const selected = STATUS_OPTIONS.find((o) => o.value === value) ?? STATUS_OPTIONS[0];
+  const selected = options.find((o) => o.value === value) ?? options[0];
 
   return (
     <div ref={ref} className="relative">
@@ -62,7 +69,7 @@ function StatusDropdown({
 
       {open && (
         <div className="absolute left-0 top-[calc(100%+6px)] z-50 w-48 rounded-2xl border border-border bg-background shadow-lg shadow-black/10 overflow-hidden py-1">
-          {STATUS_OPTIONS.map((opt) => (
+          {options.map((opt) => (
             <button
               key={opt.value}
               type="button"
@@ -85,29 +92,29 @@ function StatusDropdown({
 }
 
 export default function CasesClient({ cases, currentUserId }: { cases: CaseWithAssignee[]; currentUserId: string | null }) {
-  const [query, setQuery]   = useState("");
-  const [status, setStatus] = useState("");
-  const [page, setPage]     = useState(1);
+  const [query,    setQuery]    = useState("");
+  const [status,   setStatus]   = useState("");
+  const [caseType, setCaseType] = useState("");
+  const [page,     setPage]     = useState(1);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return cases.filter((c) => {
-      const matchesQuery =
-        !q ||
-        c.employerName.toLowerCase().includes(q) ||
-        c.id.toLowerCase().includes(q);
-      const matchesStatus = !status || c.status === status;
-      return matchesQuery && matchesStatus;
+      const matchesQuery  = !q || c.employerName.toLowerCase().includes(q) || c.id.toLowerCase().includes(q);
+      const matchesStatus = !status   || c.status === status;
+      const matchesType   = !caseType || c.types.includes(caseType);
+      return matchesQuery && matchesStatus && matchesType;
     });
-  }, [cases, query, status]);
+  }, [cases, query, status, caseType]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const totalPages  = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
-  const start = (currentPage - 1) * PAGE_SIZE;
-  const paginated = filtered.slice(start, start + PAGE_SIZE);
+  const start       = (currentPage - 1) * PAGE_SIZE;
+  const paginated   = filtered.slice(start, start + PAGE_SIZE);
 
-  const handleQuery = (value: string) => { setQuery(value); setPage(1); };
-  const handleStatus = (value: string) => { setStatus(value); setPage(1); };
+  const handleQuery    = (v: string) => { setQuery(v);    setPage(1); };
+  const handleStatus   = (v: string) => { setStatus(v);   setPage(1); };
+  const handleCaseType = (v: string) => { setCaseType(v); setPage(1); };
 
   return (
     <div className="space-y-4">
@@ -124,7 +131,8 @@ export default function CasesClient({ cases, currentUserId }: { cases: CaseWithA
           />
         </div>
 
-        <StatusDropdown value={status} onChange={handleStatus} />
+        <FilterDropdown value={status}   options={STATUS_OPTIONS} onChange={handleStatus}   />
+        <FilterDropdown value={caseType} options={TYPE_OPTIONS}   onChange={handleCaseType} />
       </div>
 
       {/* Table */}
