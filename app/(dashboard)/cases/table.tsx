@@ -46,10 +46,13 @@ export default function Table({ cases, currentUserId, query = "" }: { cases: Cas
     {
       key: "employerName",
       header: "Employer",
-      render: (v) => (
-        <span className="text-sm font-medium text-foreground">
-          {highlight(String(v), query)}
-        </span>
+      render: (v, row) => (
+        <div>
+          <p className="text-sm font-medium text-foreground">{highlight(String(v), query)}</p>
+          <p className="font-mono text-[11px] text-muted-foreground mt-0.5">
+            {highlight(String(row.employerCode), query)}
+          </p>
+        </div>
       ),
     },
     {
@@ -71,13 +74,6 @@ export default function Table({ cases, currentUserId, query = "" }: { cases: Cas
           </div>
         );
       },
-    },
-    {
-      key: "employerCode",
-      header: "Code",
-      render: (v) => (
-        <span className="font-mono text-[11px] text-muted-foreground">{String(v)}</span>
-      ),
     },
     {
       key: "referralDate",
