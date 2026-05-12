@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Building2, Search, X, Phone, MapPin, Briefcase, Pencil, Check, Loader2 } from "lucide-react";
-import { createEmployer } from "@/app/actions/create-employer";
+import { Plus, Building2, Search, Phone, MapPin, Briefcase, Pencil, Check, Loader2 } from "lucide-react";
+import Link from "next/link";
 import { updateEmployer } from "@/app/actions/update-employer";
 
 type EmployerRow = {
@@ -17,58 +17,6 @@ type EmployerRow = {
 
 const inputCls = "w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue transition-all placeholder:text-muted-foreground/40";
 const labelCls = "block text-[11px] font-black text-muted-foreground uppercase tracking-widest mb-1.5";
-
-function RegisterForm({ onDone }: { onDone: () => void }) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    try {
-      await createEmployer(new FormData(e.currentTarget));
-      onDone();
-    } catch {
-      setError("Failed to register employer. Name or code may already exist.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="p-6 rounded-2xl border border-border bg-background space-y-4">
-      <h3 className="text-sm font-bold text-foreground">Register New Employer</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="md:col-span-2">
-          <label className={labelCls}>Employer Name</label>
-          <input name="name" required placeholder="e.g. Solomon Airlines" className={inputCls} />
-        </div>
-        <div>
-          <label className={labelCls}>Employer Code</label>
-          <input name="code" required placeholder="e.g. SAL-0001" className={inputCls} />
-        </div>
-        <div>
-          <label className={labelCls}>Phone <span className="normal-case font-medium">(optional)</span></label>
-          <input name="phone" placeholder="+677 XXXXX" className={inputCls} />
-        </div>
-        <div className="md:col-span-2">
-          <label className={labelCls}>Address <span className="normal-case font-medium">(optional)</span></label>
-          <input name="address" placeholder="Street address" className={inputCls} />
-        </div>
-      </div>
-      {error && <p className="text-sm text-red-600 font-medium">{error}</p>}
-      <div className="flex justify-end gap-2">
-        <button type="button" onClick={onDone} className="px-4 py-2 rounded-xl text-sm font-semibold border border-border hover:bg-muted transition-all">
-          Cancel
-        </button>
-        <button type="submit" disabled={loading} className="px-6 py-2 rounded-xl bg-brand-blue text-white text-sm font-bold hover:bg-brand-blue/90 disabled:opacity-50 transition-all active:scale-95">
-          {loading ? "Saving…" : "Register Employer"}
-        </button>
-      </div>
-    </form>
-  );
-}
 
 function EditableCard({ emp }: { emp: EmployerRow }) {
   const [editing, setEditing] = useState(false);
@@ -198,7 +146,6 @@ function EditableCard({ emp }: { emp: EmployerRow }) {
 
 export default function EmployersClient({ employers }: { employers: EmployerRow[] }) {
   const [query, setQuery] = useState("");
-  const [showForm, setShowForm] = useState(false);
 
   const filtered = employers.filter(
     (e) =>
@@ -216,19 +163,14 @@ export default function EmployersClient({ employers }: { employers: EmployerRow[
             {employers.length} registered employer{employers.length !== 1 ? "s" : ""}
           </p>
         </div>
-        <button
-          onClick={() => setShowForm((s) => !s)}
+        <Link
+          href="/employers/register"
           className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-brand-blue text-white text-sm font-semibold shadow-sm hover:bg-brand-blue/90 active:scale-95 transition-all"
         >
-          {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4 stroke-[2.5px]" />}
-          {showForm ? "Cancel" : "Register Employer"}
-        </button>
+          <Plus className="w-4 h-4 stroke-[2.5px]" />
+          Register Employer
+        </Link>
       </div>
-
-      {/* Register form */}
-      {showForm && (
-        <RegisterForm onDone={() => { setShowForm(false); window.location.reload(); }} />
-      )}
 
       {/* Search */}
       <div className="relative group w-72">
