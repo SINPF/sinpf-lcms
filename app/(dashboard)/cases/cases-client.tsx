@@ -131,7 +131,7 @@ function EmployerFilter({
         }`}
       >
         <Building2 className="w-3.5 h-3.5 shrink-0" />
-        <span className="max-w-[140px] truncate">{selected ? selected.name : "All Employers"}</span>
+        <span className="max-w-35 truncate">{selected ? selected.name : "All Employers"}</span>
         <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
 
