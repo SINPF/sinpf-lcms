@@ -205,7 +205,7 @@ function ActivityFeed({
                 <div className="flex items-center gap-3 flex-wrap">
                   <span className="flex items-center gap-1 text-xs text-muted-foreground">
                     <IconUser className="w-3 h-3 shrink-0" />
-                    {a.performerName ?? a.performerEmail ?? <span className="italic">Unknown</span>}
+                    {a.performerName || a.performerEmail || <span className="italic">Unknown</span>}
                   </span>
                   <span className="text-[11px] text-muted-foreground/60 tabular-nums">
                     {formatTimestamp(a.createdAt)}
