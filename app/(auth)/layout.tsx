@@ -16,17 +16,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="absolute -top-32 left-1/4 w-96 h-96 rounded-full bg-brand-blue/20 blur-[130px] pointer-events-none" />
       <div className="absolute -bottom-32 right-1/4 w-64 h-64 rounded-full bg-brand-yellow/10 blur-[100px] pointer-events-none" />
 
-      <div className="relative z-10 w-full max-w-md">
-        {/* Page title */}
-        <div className="text-center mb-8">
-          <h1 className="text-white text-xl font-bold tracking-tight">
-            Legal Case Management
-          </h1>
-          <p className="text-brand-yellow text-[11px] mt-1.5 font-black tracking-[0.2em] uppercase">
-            Secure Justice Portal
-          </p>
-        </div>
-
+      <div className="relative z-10 w-full flex justify-center">
         {children}
       </div>
     </div>
