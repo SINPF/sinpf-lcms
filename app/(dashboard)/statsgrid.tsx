@@ -176,7 +176,7 @@ function StagePipeline({ byStage }: { byStage: Record<string, number> }) {
 function ActivityFeed({
   activities,
 }: {
-  activities: { id: string; caseId: string; activityType: string; createdAt: Date; performerName: string | null }[];
+  activities: { id: string; caseId: string; activityType: string; createdAt: Date; performerName: string | null; performerEmail: string | null }[];
 }) {
   return (
     <div className="bg-background rounded-2xl border border-border overflow-hidden">
@@ -205,7 +205,7 @@ function ActivityFeed({
                 <div className="flex items-center gap-3 flex-wrap">
                   <span className="flex items-center gap-1 text-xs text-muted-foreground">
                     <IconUser className="w-3 h-3 shrink-0" />
-                    {a.performerName ?? <span className="italic">Unknown</span>}
+                    {a.performerName ?? a.performerEmail ?? <span className="italic">Unknown</span>}
                   </span>
                   <span className="text-[11px] text-muted-foreground/60 tabular-nums">
                     {formatTimestamp(a.createdAt)}
@@ -257,11 +257,12 @@ export default async function StatsGrid() {
       .where(ne(caseReferrals.status, "closed")),
 
     db.select({
-        id:            caseActivities.id,
-        caseId:        caseActivities.caseReferralId,
-        activityType:  caseActivities.activityType,
-        createdAt:     caseActivities.createdAt,
-        performerName: user.name,
+        id:             caseActivities.id,
+        caseId:         caseActivities.caseReferralId,
+        activityType:   caseActivities.activityType,
+        createdAt:      caseActivities.createdAt,
+        performerName:  user.name,
+        performerEmail: user.email,
       })
       .from(caseActivities)
       .leftJoin(user, eq(caseActivities.performedBy, user.id))
