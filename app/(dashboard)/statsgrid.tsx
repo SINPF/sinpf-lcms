@@ -10,7 +10,7 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { db } from "@/db";
-import { caseReferrals, caseReferralTypes, caseActivities, user } from "@/db/schema";
+import { caseReferrals, caseReferralTypes, caseActivities, employers, user } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { eq, count, ne, gte, lt, desc, and, sum } from "drizzle-orm";
@@ -30,22 +30,35 @@ function formatTimestamp(date: Date): string {
   );
 }
 
-const ACTIVITY_LABELS: Record<string, string> = {
-  stage_changed:          "Stage changed",
-  assessment_completed:   "Assessment completed",
-  demand_letter_issued:   "Demand letter issued",
-  negotiation_entered:    "Negotiation entered",
-  negotiation_completed:  "Negotiation completed",
-  prosecution_filed:      "Prosecution filed",
-  hearing_scheduled:      "Hearing scheduled",
-  consent_order_entered:  "Consent order entered",
-  default_judgment_filed: "Default judgment filed",
-  enforcement_filed:      "Enforcement filed",
-  case_discontinued:      "Case discontinued",
-  case_closed:            "Case closed",
-  document_added:         "Document added",
-  note_added:             "Note added",
-};
+function buildActivityLabel(type: string, notes: string | null, employer: string): string {
+  const titleCase = (s: string) => s.replace(/\b\w/g, (c) => c.toUpperCase());
+
+  switch (type) {
+    case "stage_changed": {
+      const stage = notes?.replace(/^stage changed to /i, "").trim() ?? "";
+      return `Moved to ${titleCase(stage)} · ${employer}`;
+    }
+    case "case_closed": {
+      const reason = notes?.split(/—|-/)[1]?.trim() ?? "";
+      return reason
+        ? `Case closed (${titleCase(reason)}) · ${employer}`
+        : `Case closed · ${employer}`;
+    }
+    case "assessment_completed":   return `Assessment completed · ${employer}`;
+    case "demand_letter_issued":   return `Demand letter issued to ${employer}`;
+    case "negotiation_entered":    return `Negotiation entered with ${employer}`;
+    case "negotiation_completed":  return `Negotiation completed with ${employer}`;
+    case "prosecution_filed":      return `Prosecution filed against ${employer}`;
+    case "hearing_scheduled":      return `Hearing scheduled · ${employer}`;
+    case "consent_order_entered":  return `Consent order entered · ${employer}`;
+    case "default_judgment_filed": return `Default judgment filed · ${employer}`;
+    case "enforcement_filed":      return `Enforcement action filed · ${employer}`;
+    case "case_discontinued":      return `Case discontinued · ${employer}`;
+    case "note_added":             return `Note added · ${employer}`;
+    case "document_added":         return `Document added · ${employer}`;
+    default:                       return notes ?? type.replace(/_/g, " ");
+  }
+}
 
 const STAGE_CONFIG = [
   { status: "registered",    label: "Registered",    dot: "bg-blue-500"    },
@@ -176,7 +189,7 @@ function StagePipeline({ byStage }: { byStage: Record<string, number> }) {
 function ActivityFeed({
   activities,
 }: {
-  activities: { id: string; caseId: string; activityType: string; createdAt: Date; performerName: string | null; performerEmail: string | null }[];
+  activities: { id: string; caseId: string; activityType: string; notes: string | null; createdAt: Date; performerName: string | null; performerEmail: string | null; employerName: string | null }[];
 }) {
   return (
     <div className="bg-background rounded-2xl border border-border overflow-hidden">
@@ -197,7 +210,7 @@ function ActivityFeed({
               <IconCircleDot className="w-3.5 h-3.5 text-brand-blue/50 shrink-0 mt-0.5" />
               <div className="flex-1 min-w-0 space-y-1">
                 <p className="text-sm font-semibold text-foreground truncate">
-                  {ACTIVITY_LABELS[a.activityType] ?? a.activityType}
+                  {buildActivityLabel(a.activityType, a.notes, a.employerName ?? "Unknown Employer")}
                 </p>
                 <p className="text-xs text-muted-foreground font-mono">
                   Case {a.caseId.slice(0, 8).toUpperCase()}
@@ -260,12 +273,16 @@ export default async function StatsGrid() {
         id:             caseActivities.id,
         caseId:         caseActivities.caseReferralId,
         activityType:   caseActivities.activityType,
+        notes:          caseActivities.notes,
         createdAt:      caseActivities.createdAt,
         performerName:  user.name,
         performerEmail: user.email,
+        employerName:   employers.name,
       })
       .from(caseActivities)
-      .leftJoin(user, eq(caseActivities.performedBy, user.id))
+      .leftJoin(user,          eq(caseActivities.performedBy,        user.id))
+      .leftJoin(caseReferrals, eq(caseActivities.caseReferralId,     caseReferrals.id))
+      .leftJoin(employers,     eq(caseReferrals.employerId,          employers.id))
       .orderBy(desc(caseActivities.createdAt))
       .limit(8),
 
