@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Building2, Search, X, Phone, MapPin, Briefcase } from "lucide-react";
+import { Plus, Building2, Search, X, Phone, MapPin, Briefcase, Pencil, Check, Loader2 } from "lucide-react";
 import { createEmployer } from "@/app/actions/create-employer";
+import { updateEmployer } from "@/app/actions/update-employer";
 
 type EmployerRow = {
   id: string;
@@ -69,6 +70,132 @@ function RegisterForm({ onDone }: { onDone: () => void }) {
   );
 }
 
+function EditableCard({ emp }: { emp: EmployerRow }) {
+  const [editing, setEditing] = useState(false);
+  const [saving,  setSaving]  = useState(false);
+  const [error,   setError]   = useState<string | null>(null);
+  const [fields,  setFields]  = useState({
+    name:    emp.name,
+    code:    emp.code,
+    phone:   emp.phone    ?? "",
+    address: emp.address  ?? "",
+  });
+
+  const set = (k: keyof typeof fields) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setFields((f) => ({ ...f, [k]: e.target.value }));
+
+  const handleSave = async () => {
+    setSaving(true);
+    setError(null);
+    try {
+      await updateEmployer(emp.id, fields);
+      setEditing(false);
+    } catch {
+      setError("Failed to save. Name or code may already be in use.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setFields({ name: emp.name, code: emp.code, phone: emp.phone ?? "", address: emp.address ?? "" });
+    setEditing(false);
+    setError(null);
+  };
+
+  if (editing) {
+    return (
+      <div className="p-5 rounded-2xl border border-brand-blue/40 bg-background shadow-sm space-y-3">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="p-2.5 rounded-xl bg-brand-blue/10">
+            <Building2 className="w-5 h-5 text-brand-blue" />
+          </div>
+          <span className="text-xs font-semibold text-brand-blue">Editing</span>
+        </div>
+
+        <div className="space-y-2">
+          <div>
+            <label className={labelCls}>Name</label>
+            <input value={fields.name} onChange={set("name")} className={inputCls} placeholder="e.g. Solomon Airlines" />
+          </div>
+          <div>
+            <label className={labelCls}>Code</label>
+            <input value={fields.code} onChange={set("code")} className={inputCls} maxLength={6} placeholder="6-char code" />
+          </div>
+          <div>
+            <label className={labelCls}>Phone</label>
+            <input value={fields.phone} onChange={set("phone")} className={inputCls} placeholder="+677 XXXXX" />
+          </div>
+          <div>
+            <label className={labelCls}>Address</label>
+            <input value={fields.address} onChange={set("address")} className={inputCls} placeholder="Street address" />
+          </div>
+        </div>
+
+        {error && <p className="text-xs text-red-600 font-medium">{error}</p>}
+
+        <div className="flex items-center gap-2 pt-1">
+          <button
+            onClick={handleSave}
+            disabled={saving || !fields.name.trim() || !fields.code.trim()}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-brand-blue text-white text-xs font-bold hover:bg-brand-blue/90 disabled:opacity-50 transition-all active:scale-95"
+          >
+            {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+            Save
+          </button>
+          <button
+            onClick={handleCancel}
+            disabled={saving}
+            className="px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-border hover:bg-muted transition-all"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="group relative p-5 rounded-2xl border border-border bg-background hover:shadow-md hover:border-border/60 transition-all space-y-3">
+      <button
+        onClick={() => setEditing(true)}
+        className="absolute top-4 right-4 p-1.5 rounded-lg text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-muted hover:text-foreground transition-all"
+        title="Edit employer"
+      >
+        <Pencil className="w-3.5 h-3.5" />
+      </button>
+
+      <div className="flex items-start justify-between gap-2">
+        <div className="p-2.5 rounded-xl bg-brand-blue/10">
+          <Building2 className="w-5 h-5 text-brand-blue" />
+        </div>
+        <span className="px-2.5 py-0.5 rounded-full bg-muted text-muted-foreground text-[11px] font-bold font-mono">
+          {emp.code}
+        </span>
+      </div>
+      <div>
+        <p className="text-sm font-bold text-foreground leading-snug">{emp.name}</p>
+      </div>
+      <div className="space-y-1">
+        {emp.phone && (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Phone className="w-3 h-3 shrink-0" /> {emp.phone}
+          </div>
+        )}
+        {emp.address && (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <MapPin className="w-3 h-3 shrink-0" /> {emp.address}
+          </div>
+        )}
+      </div>
+      <div className="pt-2 border-t border-border flex items-center gap-1.5 text-xs text-muted-foreground">
+        <Briefcase className="w-3.5 h-3.5 shrink-0" />
+        <span>{emp.caseCount} {emp.caseCount === 1 ? "case" : "cases"}</span>
+      </div>
+    </div>
+  );
+}
+
 export default function EmployersClient({ employers }: { employers: EmployerRow[] }) {
   const [query, setQuery] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -121,35 +248,7 @@ export default function EmployersClient({ employers }: { employers: EmployerRow[
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((emp) => (
-            <div key={emp.id} className="p-5 rounded-2xl border border-border bg-background hover:shadow-md hover:border-border/60 transition-all space-y-3">
-              <div className="flex items-start justify-between gap-2">
-                <div className="p-2.5 rounded-xl bg-brand-blue/10">
-                  <Building2 className="w-5 h-5 text-brand-blue" />
-                </div>
-                <span className="px-2.5 py-0.5 rounded-full bg-muted text-muted-foreground text-[11px] font-bold font-mono">
-                  {emp.code}
-                </span>
-              </div>
-              <div>
-                <p className="text-sm font-bold text-foreground leading-snug">{emp.name}</p>
-              </div>
-              <div className="space-y-1">
-                {emp.phone && (
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Phone className="w-3 h-3 shrink-0" /> {emp.phone}
-                  </div>
-                )}
-                {emp.address && (
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <MapPin className="w-3 h-3 shrink-0" /> {emp.address}
-                  </div>
-                )}
-              </div>
-              <div className="pt-2 border-t border-border flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Briefcase className="w-3.5 h-3.5 shrink-0" />
-                <span>{emp.caseCount} {emp.caseCount === 1 ? "case" : "cases"}</span>
-              </div>
-            </div>
+            <EditableCard key={emp.id} emp={emp} />
           ))}
         </div>
       )}
