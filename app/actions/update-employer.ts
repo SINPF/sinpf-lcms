@@ -9,7 +9,7 @@ import { revalidatePath } from "next/cache";
 
 export async function updateEmployer(
   id: string,
-  data: { name: string; code: string; phone: string; address: string },
+  data: { name: string; code: string; phone: string; email: string; address: string },
 ) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user.id) throw new Error("Not authenticated");
@@ -19,8 +19,9 @@ export async function updateEmployer(
     .set({
       name:      data.name,
       code:      data.code,
-      phone:     data.phone    || null,
-      address:   data.address  || null,
+      phone:     data.phone   || null,
+      email:     data.email   || null,
+      address:   data.address || null,
       updatedAt: new Date(),
     })
     .where(eq(employers.id, id));

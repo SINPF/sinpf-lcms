@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Building2, Loader2 } from "lucide-react";
+import { X, Building2, Loader2, Mail } from "lucide-react";
 import { createEmployer } from "@/app/actions/create-employer";
 import { useRouter } from "next/navigation";
 
@@ -66,9 +66,13 @@ export default function EmployerRegisterForm({ onClose }: { onClose: () => void 
             <input name="phone" placeholder="+677 XXXXX" className={inputCls} />
           </div>
           <div>
-            <label className={labelCls}>Address <span className="normal-case font-medium">(optional)</span></label>
-            <input name="address" placeholder="Street address" className={inputCls} />
+            <label className={labelCls}>Email <span className="normal-case font-medium">(optional)</span></label>
+            <input name="email" type="email" placeholder="employer@example.com" className={inputCls} />
           </div>
+        </div>
+        <div>
+          <label className={labelCls}>Address <span className="normal-case font-medium">(optional)</span></label>
+          <input name="address" placeholder="Street address" className={inputCls} />
         </div>
 
         {error && <p className="text-sm text-red-600 font-medium">{error}</p>}

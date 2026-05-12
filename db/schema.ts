@@ -164,6 +164,7 @@ export const employers = pgTable("employers", {
   name:      text("name").notNull().unique(),
   code:      text("code").notNull().unique(),
   phone:     text("phone"),
+  email:     text("email"),
   address:   text("address"),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
   updatedAt: timestamp("updated_at").notNull().default(sql`now()`),

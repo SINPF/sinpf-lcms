@@ -10,6 +10,7 @@ export default async function EmployersPage() {
       name:      employers.name,
       code:      employers.code,
       phone:     employers.phone,
+      email:     employers.email,
       address:   employers.address,
       createdAt: employers.createdAt,
       caseCount: count(caseReferrals.id),

@@ -13,11 +13,12 @@ export async function createEmployer(formData: FormData) {
   const name    = formData.get("name")    as string;
   const code    = formData.get("code")    as string;
   const phone   = formData.get("phone")   as string | null;
+  const email   = formData.get("email")   as string | null;
   const address = formData.get("address") as string | null;
 
   const [employer] = await db
     .insert(employers)
-    .values({ name, code, phone: phone || null, address: address || null })
+    .values({ name, code, phone: phone || null, email: email || null, address: address || null })
     .returning();
 
   revalidatePath("/employers");

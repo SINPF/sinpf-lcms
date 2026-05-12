@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Building2, Search, Phone, MapPin, Briefcase, Pencil, Check, Loader2 } from "lucide-react";
+import { Plus, Building2, Search, Phone, MapPin, Briefcase, Pencil, Check, Loader2, Mail } from "lucide-react";
 import Link from "next/link";
 import { updateEmployer } from "@/app/actions/update-employer";
 
@@ -10,6 +10,7 @@ type EmployerRow = {
   name: string;
   code: string;
   phone: string | null;
+  email: string | null;
   address: string | null;
   createdAt: Date;
   caseCount: number;
@@ -25,8 +26,9 @@ function EditableCard({ emp }: { emp: EmployerRow }) {
   const [fields,  setFields]  = useState({
     name:    emp.name,
     code:    emp.code,
-    phone:   emp.phone    ?? "",
-    address: emp.address  ?? "",
+    phone:   emp.phone   ?? "",
+    email:   emp.email   ?? "",
+    address: emp.address ?? "",
   });
 
   const set = (k: keyof typeof fields) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -46,7 +48,7 @@ function EditableCard({ emp }: { emp: EmployerRow }) {
   };
 
   const handleCancel = () => {
-    setFields({ name: emp.name, code: emp.code, phone: emp.phone ?? "", address: emp.address ?? "" });
+    setFields({ name: emp.name, code: emp.code, phone: emp.phone ?? "", email: emp.email ?? "", address: emp.address ?? "" });
     setEditing(false);
     setError(null);
   };
@@ -73,6 +75,10 @@ function EditableCard({ emp }: { emp: EmployerRow }) {
           <div>
             <label className={labelCls}>Phone</label>
             <input value={fields.phone} onChange={set("phone")} className={inputCls} placeholder="+677 XXXXX" />
+          </div>
+          <div>
+            <label className={labelCls}>Email</label>
+            <input value={fields.email} onChange={set("email")} type="email" className={inputCls} placeholder="employer@example.com" />
           </div>
           <div>
             <label className={labelCls}>Address</label>
@@ -125,11 +131,18 @@ function EditableCard({ emp }: { emp: EmployerRow }) {
         <p className="text-sm font-bold text-foreground leading-snug">{emp.name}</p>
       </div>
       <div className="space-y-1">
-        {emp.phone && (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Phone className="w-3 h-3 shrink-0" /> {emp.phone}
-          </div>
-        )}
+        <div className="flex items-center gap-2 text-xs">
+          <Phone className="w-3 h-3 shrink-0 text-muted-foreground" />
+          {emp.phone
+            ? <span className="text-muted-foreground">{emp.phone}</span>
+            : <span className="italic text-muted-foreground/50">No phone</span>}
+        </div>
+        <div className="flex items-center gap-2 text-xs">
+          <Mail className="w-3 h-3 shrink-0 text-muted-foreground" />
+          {emp.email
+            ? <span className="text-muted-foreground">{emp.email}</span>
+            : <span className="italic text-muted-foreground/50">No email</span>}
+        </div>
         {emp.address && (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <MapPin className="w-3 h-3 shrink-0" /> {emp.address}
