@@ -2,10 +2,12 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 import { db } from "@/db";
 import { caseReferrals } from "@/db/schema";
-import { count } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 
 export default async function NavBar() {
-  const [{ total }] = await db.select({ total: count() }).from(caseReferrals);
+  const [{ total }]  = await db.select({ total: count() }).from(caseReferrals);
+  const [{ closed }] = await db.select({ closed: count() }).from(caseReferrals).where(eq(caseReferrals.status, "closed"));
+  const active = total - closed;
 
   return (
     <div className="mb-8">
@@ -13,7 +15,13 @@ export default async function NavBar() {
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-bold text-foreground">Case Records</h2>
           <span className="px-2.5 py-0.5 rounded-full bg-brand-blue/10 text-brand-blue text-xs font-bold">
-            {total}
+            {total} total
+          </span>
+          <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 text-xs font-bold">
+            {active} active
+          </span>
+          <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-500 text-xs font-bold">
+            {closed} closed
           </span>
         </div>
 

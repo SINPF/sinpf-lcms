@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useRef, useEffect } from "react";
-import { Search, ChevronLeft, ChevronRight, ChevronDown, Check, ListFilter, UserCheck, X, Building2 } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, ChevronDown, Check, ListFilter, UserCheck, X, Building2, Archive } from "lucide-react";
 import Table from "./table";
 import type { CaseWithAssignee } from "@/db/types";
 
@@ -200,17 +200,21 @@ export default function CasesClient({
   const [caseType,   setCaseType]   = useState(initialCaseType);
   const [employerId, setEmployerId] = useState("");
   const [myCases,    setMyCases]    = useState(initialMyCases);
+  const [showClosed, setShowClosed] = useState(false);
   const [page,     setPage]     = useState(1);
 
-  const hasActiveFilters = !!query || !!status || !!caseType || !!employerId || myCases;
+  const hasActiveFilters = !!query || !!status || !!caseType || !!employerId || myCases || showClosed;
 
   const clearFilters = () => {
-    setQuery(""); setStatus(""); setCaseType(""); setEmployerId(""); setMyCases(false); setPage(1);
+    setQuery(""); setStatus(""); setCaseType(""); setEmployerId(""); setMyCases(false); setShowClosed(false); setPage(1);
   };
+
+  const closedCount = useMemo(() => cases.filter((c) => c.status === "closed").length, [cases]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return cases.filter((c) => {
+      if (!showClosed && status !== "closed" && c.status === "closed") return false;
       const matchesQuery    = !q          || c.employerName.toLowerCase().includes(q) || c.employerCode.toLowerCase().includes(q) || c.id.toLowerCase().includes(q);
       const matchesStatus   = !status     || c.status === status;
       const matchesType     = !caseType   || c.types.includes(caseType);
@@ -218,7 +222,7 @@ export default function CasesClient({
       const matchesMine     = !myCases    || c.assignedTo === currentUserId;
       return matchesQuery && matchesStatus && matchesType && matchesEmployer && matchesMine;
     });
-  }, [cases, query, status, caseType, employerId, myCases, currentUserId]);
+  }, [cases, query, status, caseType, employerId, myCases, currentUserId, showClosed]);
 
   const totalPages  = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -268,6 +272,24 @@ export default function CasesClient({
           </span>
         </button>
 
+        <button
+          type="button"
+          onClick={() => { setShowClosed((v) => !v); setPage(1); }}
+          className={`flex items-center gap-2 h-10 px-3.5 rounded-xl border text-sm font-medium transition-all ${
+            showClosed
+              ? "border-brand-blue bg-brand-blue/5 text-brand-blue"
+              : "border-border bg-background text-foreground hover:border-brand-blue/50"
+          }`}
+        >
+          <Archive className="w-3.5 h-3.5 shrink-0" />
+          Closed
+          <span className={`w-4 h-4 rounded flex items-center justify-center border transition-all ${
+            showClosed ? "bg-brand-blue border-brand-blue" : "border-border"
+          }`}>
+            {showClosed && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
+          </span>
+        </button>
+
         {hasActiveFilters && (
           <button
             type="button"
@@ -284,6 +306,13 @@ export default function CasesClient({
       {hasActiveFilters && (
         <p className="px-1 text-sm text-muted-foreground">
           {filtered.length} of {cases.length} {cases.length === 1 ? "case" : "cases"} matched
+        </p>
+      )}
+
+      {/* Closed-cases hidden notice — always visible when closed cases exist and are hidden */}
+      {!showClosed && status !== "closed" && closedCount > 0 && (
+        <p className="px-1 text-sm text-muted-foreground">
+          {closedCount} closed {closedCount === 1 ? "case" : "cases"} hidden
         </p>
       )}
 
