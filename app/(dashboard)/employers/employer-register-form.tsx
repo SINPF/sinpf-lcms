@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Building2, Loader2, Mail } from "lucide-react";
+import { X, Building2, Loader2 } from "lucide-react";
 import { createEmployer } from "@/app/actions/create-employer";
 import { useRouter } from "next/navigation";
 
@@ -44,6 +44,7 @@ export default function EmployerRegisterForm({ onClose }: { onClose: () => void 
         <button
           type="button"
           onClick={onClose}
+          title="Close"
           className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
         >
           <X className="w-4 h-4" />
