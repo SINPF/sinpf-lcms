@@ -22,13 +22,12 @@ function formatSBD(value: number): string {
   return "SBD " + value.toLocaleString("en-AU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function timeAgo(date: Date): string {
-  const mins = Math.floor((Date.now() - date.getTime()) / 60000);
-  if (mins < 1)  return "just now";
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24)  return `${hrs}h ago`;
-  return `${Math.floor(hrs / 24)}d ago`;
+function formatTimestamp(date: Date): string {
+  return (
+    date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) +
+    " · " +
+    date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
+  );
 }
 
 const ACTIVITY_LABELS: Record<string, string> = {
@@ -193,19 +192,26 @@ function ActivityFeed({
             <Link
               key={a.id}
               href={`/cases/${a.caseId}`}
-              className="flex items-center gap-3 px-5 py-3.5 hover:bg-muted/40 transition-colors group"
+              className="flex items-start gap-3 px-5 py-4 hover:bg-muted/40 transition-colors group"
             >
-              <IconCircleDot className="w-3.5 h-3.5 text-brand-blue/50 shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">
+              <IconCircleDot className="w-3.5 h-3.5 text-brand-blue/50 shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0 space-y-1">
+                <p className="text-sm font-semibold text-foreground truncate">
                   {ACTIVITY_LABELS[a.activityType] ?? a.activityType}
                 </p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  <span className="font-mono font-semibold">{a.caseId.slice(0, 8).toUpperCase()}</span>
-                  {a.performerName && <span> · {a.performerName}</span>}
+                <p className="text-xs text-muted-foreground font-mono">
+                  Case {a.caseId.slice(0, 8).toUpperCase()}
                 </p>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <IconUser className="w-3 h-3 shrink-0" />
+                    {a.performerName ?? <span className="italic">Unknown</span>}
+                  </span>
+                  <span className="text-[11px] text-muted-foreground/60 tabular-nums">
+                    {formatTimestamp(a.createdAt)}
+                  </span>
+                </div>
               </div>
-              <span className="text-[11px] text-muted-foreground shrink-0 tabular-nums">{timeAgo(a.createdAt)}</span>
             </Link>
           ))}
         </div>
