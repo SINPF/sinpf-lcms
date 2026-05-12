@@ -2,19 +2,63 @@ import {
   IconReceiptTax,
   IconCoin,
   IconCash,
-  IconScale,
-  IconHome,
-  IconBuildingStore,
   IconUser,
   IconArrowRight,
+  IconSum,
+  IconCalendarPlus,
+  IconCircleDot,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { db } from "@/db";
-import { caseReferrals, caseReferralTypes } from "@/db/schema";
+import { caseReferrals, caseReferralTypes, caseActivities, user } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { eq, count } from "drizzle-orm";
+import { eq, count, ne, gte, lt, desc, and, sum } from "drizzle-orm";
 import type { ReactNode } from "react";
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function formatSBD(value: number): string {
+  return "SBD " + value.toLocaleString("en-AU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function timeAgo(date: Date): string {
+  const mins = Math.floor((Date.now() - date.getTime()) / 60000);
+  if (mins < 1)  return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24)  return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
+const ACTIVITY_LABELS: Record<string, string> = {
+  stage_changed:          "Stage changed",
+  assessment_completed:   "Assessment completed",
+  demand_letter_issued:   "Demand letter issued",
+  negotiation_entered:    "Negotiation entered",
+  negotiation_completed:  "Negotiation completed",
+  prosecution_filed:      "Prosecution filed",
+  hearing_scheduled:      "Hearing scheduled",
+  consent_order_entered:  "Consent order entered",
+  default_judgment_filed: "Default judgment filed",
+  enforcement_filed:      "Enforcement filed",
+  case_discontinued:      "Case discontinued",
+  case_closed:            "Case closed",
+  document_added:         "Document added",
+  note_added:             "Note added",
+};
+
+const STAGE_CONFIG = [
+  { status: "registered",    label: "Registered",    dot: "bg-blue-500"    },
+  { status: "assessment",    label: "Assessment",    dot: "bg-sky-500"     },
+  { status: "demand_issued", label: "Demand Issued", dot: "bg-amber-500"   },
+  { status: "negotiation",   label: "Negotiation",   dot: "bg-orange-500"  },
+  { status: "prosecution",   label: "Prosecution",   dot: "bg-red-500"     },
+  { status: "in_progress",   label: "In Progress",   dot: "bg-emerald-500" },
+  { status: "resolved",      label: "Resolved",      dot: "bg-teal-500"    },
+];
+
+// ─── Card components ──────────────────────────────────────────────────────────
 
 function PrimaryCard({
   label,
@@ -22,12 +66,14 @@ function PrimaryCard({
   description,
   icon,
   href,
+  linkLabel = "View cases",
 }: {
   label: string;
   value: string;
   description: string;
   icon: ReactNode;
   href: string;
+  linkLabel?: string;
 }) {
   return (
     <Link
@@ -36,24 +82,19 @@ function PrimaryCard({
       style={{ background: "linear-gradient(135deg, #0f2444 0%, #1a3a6b 50%, #0f2444 100%)" }}
     >
       <div className="relative p-7 flex items-center justify-between gap-6">
-        {/* Radial glows */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/4 w-64 h-64 rounded-full opacity-20 blur-3xl" style={{ background: "radial-gradient(circle, #089fff 0%, transparent 70%)" }} />
           <div className="absolute bottom-0 right-1/4 w-48 h-48 rounded-full opacity-15 blur-2xl" style={{ background: "radial-gradient(circle, #ffdf18 0%, transparent 70%)" }} />
         </div>
-
-        <div className="relative z-10">
+        <div className="relative z-10 min-w-0">
           <p className="text-[11px] font-black uppercase tracking-widest text-white/50 mb-2">{description}</p>
-          <p className="text-5xl font-black text-white tracking-tight font-mono leading-none mb-3">{value}</p>
+          <p className="text-4xl font-black text-white tracking-tight font-mono leading-none mb-3 truncate">{value}</p>
           <p className="text-lg font-bold text-white/90">{label}</p>
         </div>
-
-        <div className="relative z-10 flex flex-col items-end gap-4">
-          <div className="p-4 rounded-2xl bg-white/10 text-white/80">
-            {icon}
-          </div>
+        <div className="relative z-10 flex flex-col items-end gap-4 shrink-0">
+          <div className="p-4 rounded-2xl bg-white/10 text-white/80">{icon}</div>
           <span className="flex items-center gap-1.5 text-xs font-semibold text-white/50 group-hover:text-white/80 transition-colors">
-            View cases <IconArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            {linkLabel} <IconArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
           </span>
         </div>
       </div>
@@ -68,6 +109,7 @@ function SecondaryCard({
   icon,
   href,
   accent,
+  badge,
 }: {
   label: string;
   value: string;
@@ -75,6 +117,7 @@ function SecondaryCard({
   icon: ReactNode;
   href: string;
   accent: string;
+  badge?: ReactNode;
 }) {
   return (
     <Link
@@ -84,10 +127,13 @@ function SecondaryCard({
       <div className={`h-1 ${accent}`} />
       <div className="p-5">
         <div className="flex items-start justify-between mb-4">
-          <div className={`p-2.5 rounded-xl bg-muted/60`}>
+          <div className="p-2.5 rounded-xl bg-muted/60">
             <span className="text-muted-foreground">{icon}</span>
           </div>
-          <IconArrowRight className="w-4 h-4 text-border group-hover:text-muted-foreground group-hover:translate-x-0.5 transition-all" />
+          <div className="flex items-center gap-2">
+            {badge}
+            <IconArrowRight className="w-4 h-4 text-border group-hover:text-muted-foreground group-hover:translate-x-0.5 transition-all" />
+          </div>
         </div>
         <p className="text-2xl font-bold text-foreground tracking-tight font-mono leading-none">{value}</p>
         <p className="text-sm font-semibold text-foreground mt-1.5">{label}</p>
@@ -97,40 +143,176 @@ function SecondaryCard({
   );
 }
 
+function StagePipeline({ byStage }: { byStage: Record<string, number> }) {
+  const total = STAGE_CONFIG.reduce((s, c) => s + (byStage[c.status] ?? 0), 0);
+  return (
+    <div className="bg-background rounded-2xl border border-border overflow-hidden">
+      <div className="px-5 py-4 border-b border-border">
+        <h3 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">Cases by Stage</h3>
+      </div>
+      <div className="grid grid-cols-4 lg:grid-cols-7">
+        {STAGE_CONFIG.map((s, i) => {
+          const n   = byStage[s.status] ?? 0;
+          const pct = total > 0 ? Math.round((n / total) * 100) : 0;
+          return (
+            <Link
+              key={s.status}
+              href={`/cases?status=${s.status}`}
+              className={`group flex flex-col items-center gap-2 py-5 px-3 hover:bg-muted/50 transition-colors text-center ${
+                i < STAGE_CONFIG.length - 1 ? "border-r border-border" : ""
+              }`}
+            >
+              <span className="text-3xl font-black font-mono text-foreground leading-none">{n}</span>
+              <span className={`w-2 h-2 rounded-full ${s.dot}`} />
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide leading-tight">{s.label}</span>
+              <span className="text-[10px] text-muted-foreground/50">{pct}%</span>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function ActivityFeed({
+  activities,
+}: {
+  activities: { id: string; caseId: string; activityType: string; createdAt: Date; performerName: string | null }[];
+}) {
+  return (
+    <div className="bg-background rounded-2xl border border-border overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+        <h3 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">Recent Activity</h3>
+        <Link href="/cases" className="text-xs font-semibold text-brand-blue hover:underline">View all cases</Link>
+      </div>
+      {activities.length === 0 ? (
+        <p className="px-5 py-10 text-sm text-center text-muted-foreground">No activity recorded yet.</p>
+      ) : (
+        <div className="divide-y divide-border">
+          {activities.map((a) => (
+            <Link
+              key={a.id}
+              href={`/cases/${a.caseId}`}
+              className="flex items-center gap-3 px-5 py-3.5 hover:bg-muted/40 transition-colors group"
+            >
+              <IconCircleDot className="w-3.5 h-3.5 text-brand-blue/50 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground truncate">
+                  {ACTIVITY_LABELS[a.activityType] ?? a.activityType}
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  <span className="font-mono font-semibold">{a.caseId.slice(0, 8).toUpperCase()}</span>
+                  {a.performerName && <span> · {a.performerName}</span>}
+                </p>
+              </div>
+              <span className="text-[11px] text-muted-foreground shrink-0 tabular-nums">{timeAgo(a.createdAt)}</span>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+
 export default async function StatsGrid() {
   const session = await auth.api.getSession({ headers: await headers() });
-  const userId = session?.user.id;
+  const userId  = session?.user.id;
 
-  const [typeCounts, assignedResult] = await Promise.all([
-    db
-      .select({ caseType: caseReferralTypes.caseType, total: count() })
+  const now           = new Date();
+  const monthStart    = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+  const [
+    typeCounts,
+    assignedResult,
+    stageCounts,
+    claimResult,
+    recentActivities,
+    thisMonthResult,
+    lastMonthResult,
+  ] = await Promise.all([
+    db.select({ caseType: caseReferralTypes.caseType, total: count() })
       .from(caseReferralTypes)
       .groupBy(caseReferralTypes.caseType),
 
     userId
-      ? db
-          .select({ total: count() })
-          .from(caseReferrals)
-          .where(eq(caseReferrals.assignedTo, userId))
+      ? db.select({ total: count() }).from(caseReferrals).where(eq(caseReferrals.assignedTo, userId))
       : Promise.resolve([{ total: 0 }]),
+
+    db.select({ status: caseReferrals.status, total: count() })
+      .from(caseReferrals)
+      .where(ne(caseReferrals.status, "closed"))
+      .groupBy(caseReferrals.status),
+
+    db.select({ total: sum(caseReferrals.grandTotalClaim) })
+      .from(caseReferrals)
+      .where(ne(caseReferrals.status, "closed")),
+
+    db.select({
+        id:            caseActivities.id,
+        caseId:        caseActivities.caseReferralId,
+        activityType:  caseActivities.activityType,
+        createdAt:     caseActivities.createdAt,
+        performerName: user.name,
+      })
+      .from(caseActivities)
+      .leftJoin(user, eq(caseActivities.performedBy, user.id))
+      .orderBy(desc(caseActivities.createdAt))
+      .limit(8),
+
+    db.select({ total: count() })
+      .from(caseReferrals)
+      .where(gte(caseReferrals.createdAt, monthStart)),
+
+    db.select({ total: count() })
+      .from(caseReferrals)
+      .where(and(
+        gte(caseReferrals.createdAt, lastMonthStart),
+        lt(caseReferrals.createdAt, monthStart),
+      )),
   ]);
 
-  const byType = Object.fromEntries(typeCounts.map((r) => [r.caseType, r.total]));
+  const byType        = Object.fromEntries(typeCounts.map((r) => [r.caseType, r.total]));
+  const byStage       = Object.fromEntries(stageCounts.map((r) => [r.status, r.total]));
   const assignedCount = assignedResult[0]?.total ?? 0;
+  const totalClaim    = parseFloat(claimResult[0]?.total ?? "0");
+  const thisMonth     = thisMonthResult[0]?.total ?? 0;
+  const lastMonth     = lastMonthResult[0]?.total ?? 0;
+  const monthDiff     = thisMonth - lastMonth;
+
+  const monthBadge = monthDiff !== 0 ? (
+    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+      monthDiff > 0 ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600"
+    }`}>
+      {monthDiff > 0 ? "+" : ""}{monthDiff} vs last month
+    </span>
+  ) : null;
 
   return (
     <div className="space-y-5">
-      {/* Primary card */}
-      <PrimaryCard
-        label="Assigned to Me"
-        value={String(assignedCount)}
-        description="cases assigned to you"
-        icon={<IconUser className="w-7 h-7" />}
-        href="/cases?mine=1"
-      />
+      {/* Primary cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <PrimaryCard
+          label="Assigned to Me"
+          value={String(assignedCount)}
+          description="cases assigned to you"
+          icon={<IconUser className="w-7 h-7" />}
+          href="/cases?mine=1"
+        />
+        <PrimaryCard
+          label="Total Outstanding Claim"
+          value={formatSBD(totalClaim)}
+          description="active cases · combined value"
+          icon={<IconSum className="w-7 h-7" />}
+          href="/cases"
+          linkLabel="View cases"
+        />
+      </div>
 
       {/* Secondary cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
         <SecondaryCard
           label="Contributions"
           value={String(byType["unpaid_contributions"] ?? 0)}
@@ -155,13 +337,22 @@ export default async function StatsGrid() {
           href="/cases?type=wages_record"
           accent="bg-brand-yellow"
         />
+        <SecondaryCard
+          label="New This Month"
+          value={String(thisMonth)}
+          description="cases opened"
+          icon={<IconCalendarPlus className="w-5 h-5" />}
+          href="/cases"
+          accent="bg-emerald-500"
+          badge={monthBadge}
+        />
       </div>
 
-      {/* Removed cards — kept for future use:
-      { label: "Trade Dispute",     icon: <IconScale />,        href: "/cases?type=trade_dispute"     }
-      { label: "Land & Titles",     icon: <IconHome />,         href: "/cases?type=land_titles"       }
-      { label: "Rental Defaulters", icon: <IconBuildingStore />, href: "/cases?type=rental_defaulters" }
-      */}
+      {/* Stage pipeline */}
+      <StagePipeline byStage={byStage} />
+
+      {/* Activity feed */}
+      <ActivityFeed activities={recentActivities} />
     </div>
   );
 }
